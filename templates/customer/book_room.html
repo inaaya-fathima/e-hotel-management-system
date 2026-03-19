@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Book Room {{ room['room_number'] }} — E-Hotel{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container" style="max-width:700px">
+    <a href="{{ url_for('room_detail', room_id=room['id']) }}" class="btn btn-outline btn-sm mb-3">
+      <i class="fas fa-arrow-left"></i> Back to Room
+    </a>
+
+    <div class="card anim-fade-up">
+      <div class="card-header">
+        <div>
+          <h1 class="card-title" style="font-size:1.4rem"><i class="fas fa-calendar-check text-accent"></i> Book Room {{ room['room_number'] }}</h1>
+          <p class="text-muted">{{ room['room_type'] }} · ₹{{ "%.0f"|format(room['price']) }}/night</p>
+        </div>
+        <img src="{{ room['image_url'] or 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=300' }}"
+             style="width:80px;height:60px;border-radius:8px;object-fit:cover" alt="Room">
+      </div>
+
+      <form method="post" action="{{ url_for('book_room', room_id=room['id']) }}" id="bookingForm">
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-sign-in-alt"></i> Check-In Date</label>
+            <input type="date" class="form-control" name="check_in" id="checkIn"
+                   min="{{ now_date if now_date else '' }}" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-sign-out-alt"></i> Check-Out Date</label>
+            <input type="date" class="form-control" name="check_out" id="checkOut" required>
+          </div>
+        </div>
+
+        <!-- Price Preview -->
+        <div id="pricePreview" style="display:none;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:20px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+            <span class="text-muted">Room Rate</span>
+            <span>₹{{ "%.0f"|format(room['price']) }} × <span id="numDays">0</span> nights</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;border-top:1px solid var(--border);padding-top:8px;margin-top:8px;font-weight:700;font-size:1.1rem">
+            <span>Total Amount</span>
+            <span class="text-accent" id="totalPrice">₹0</span>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:14px">
+          <i class="fas fa-check-circle"></i> Confirm Booking Request
+        </button>
+        <p class="text-muted text-center mt-2" style="font-size:.8rem">
+          <i class="fas fa-info-circle"></i> Your booking will be reviewed and confirmed by our admin team.
+        </p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Set minimum date to today
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('checkIn').min = today;
+
+  function calcPrice() {
+    const ci = document.getElementById('checkIn').value;
+    const co = document.getElementById('checkOut').value;
+    if (ci && co) {
+      const diff = (new Date(co) - new Date(ci)) / 86400000;
+      if (diff > 0) {
+        document.getElementById('numDays').textContent = diff;
+        document.getElementById('totalPrice').textContent = '₹' + (diff * {{ room['price'] }}).toLocaleString('en-IN');
+        document.getElementById('pricePreview').style.display = 'block';
+      }
+    }
+  }
+
+  document.getElementById('checkIn').addEventListener('change', function() {
+    document.getElementById('checkOut').min = this.value;
+    calcPrice();
+  });
+  document.getElementById('checkOut').addEventListener('change', calcPrice);
+</script>
+{% endblock %}

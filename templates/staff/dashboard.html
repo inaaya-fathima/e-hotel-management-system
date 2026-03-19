@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Staff Dashboard — E-Hotel</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/panel.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+<div class="panel-layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="staffSidebar">
+    <div class="sidebar-brand">
+      <h1 style="color:var(--accent3)"><i class="fas fa-hotel"></i> E-Hotel</h1>
+      <p>Staff Portal</p>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="{{ url_for('staff_dashboard') }}" class="sidebar-nav-item active">
+        <i class="fas fa-tachometer-alt"></i> Dashboard
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-avatar" style="background:linear-gradient(135deg,var(--accent3),var(--accent2))">
+          {{ session.staff_name[0].upper() if session.staff_name else 'S' }}
+        </div>
+        <div class="sidebar-user-info">
+          <strong>{{ session.staff_name or 'Staff' }}</strong>
+          <small>{{ session.staff_role or 'Staff' }}</small>
+        </div>
+        <a href="{{ url_for('staff_logout') }}" title="Logout" style="color:var(--danger);margin-left:auto">
+          <i class="fas fa-sign-out-alt"></i>
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <div style="flex:1;display:flex;flex-direction:column">
+    <div class="topbar">
+      <div class="topbar-left">
+        <button id="sidebarToggle" class="btn btn-icon btn-outline" style="padding:8px">
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="topbar-title">Staff Dashboard</div>
+      </div>
+      <div class="topbar-right">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}{% for cat, msg in messages %}
+        <div class="alert alert-{{ 'danger' if cat=='error' else cat }}" style="margin:0;padding:8px 14px;font-size:.82rem">{{ msg }}</div>
+        {% endfor %}{% endif %}{% endwith %}
+        <a href="{{ url_for('staff_logout') }}" class="btn btn-danger btn-sm">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+      </div>
+    </div>
+
+    <main class="panel-content">
+      <!-- Header -->
+      <div class="panel-header anim-fade-up">
+        <h1>Welcome, <span class="text-accent">{{ session.staff_name }}</span>!</h1>
+        <p>{{ session.staff_role }} · Today: {{ today }}</p>
+      </div>
+
+      <!-- Attendance -->
+      <div class="card anim-fade-up-delay-1 mb-3">
+        <div class="card-header">
+          <h2 class="card-title"><i class="fas fa-clipboard-check text-accent"></i> Today's Attendance</h2>
+          {% if attendance %}
+          <span class="status-pill {{ 'pill-confirmed' if attendance['status']=='Present' else 'pill-rejected' }}">
+            {{ attendance['status'] }}
+          </span>
+          {% else %}
+          <span class="badge badge-warning">Not Marked</span>
+          {% endif %}
+        </div>
+        <form method="post" action="{{ url_for('mark_attendance') }}" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+          <select name="status" class="form-control" style="width:auto">
+            <option value="Present">✅ Present</option>
+            <option value="Absent">❌ Absent</option>
+          </select>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-check-circle"></i> Mark Attendance
+          </button>
+        </form>
+      </div>
+
+      <div class="grid-2">
+        <!-- Room Status -->
+        <div class="card anim-fade-up-delay-2">
+          <div class="card-header">
+            <h2 class="card-title"><i class="fas fa-door-open text-accent"></i> Update Room Status</h2>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;max-height:400px;overflow-y:auto">
+            {% for room in rooms %}
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--bg2);border-radius:var(--radius);border:1px solid var(--border)">
+              <div>
+                <div style="font-weight:600">Room {{ room['room_number'] }}</div>
+                <div class="text-muted">{{ room['room_type'] }}</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span class="status-pill {{ 'pill-available' if room['status']=='Available' else 'pill-occupied' if room['status']=='Occupied' else 'pill-maintenance' }}">
+                  {{ room['status'] }}
+                </span>
+                <form method="post" action="{{ url_for('staff_update_room', room_id=room['id']) }}" style="display:flex;gap:6px">
+                  <select name="status" class="form-control" style="width:auto;padding:5px 8px;font-size:.78rem">
+                    {% for s in ['Available','Occupied','Maintenance'] %}
+                    <option value="{{ s }}" {{ 'selected' if room['status']==s else '' }}>{{ s }}</option>
+                    {% endfor %}
+                  </select>
+                  <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-sync"></i></button>
+                </form>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Service Tasks -->
+        <div class="card anim-fade-up-delay-3">
+          <div class="card-header">
+            <h2 class="card-title"><i class="fas fa-tasks text-accent"></i> My Service Tasks</h2>
+            <span class="badge badge-warning">{{ tasks|length }} pending</span>
+          </div>
+          {% if tasks %}
+          <div style="display:flex;flex-direction:column;gap:10px;max-height:400px;overflow-y:auto">
+            {% for task in tasks %}
+            <div style="padding:14px;background:var(--bg2);border-radius:var(--radius);border:1px solid var(--border)">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                <div style="font-weight:600">{{ task['service_type'] }}</div>
+                <span class="status-pill {{ 'pill-pending' if task['status']=='Pending' else 'pill-inprogress' }}">
+                  {{ task['status'] }}
+                </span>
+              </div>
+              {% if task['description'] %}
+              <div class="text-muted" style="font-size:.82rem;margin-bottom:10px">{{ task['description'] }}</div>
+              {% endif %}
+              <form method="post" action="{{ url_for('staff_update_service', service_id=task['id']) }}" style="display:flex;gap:6px">
+                <select name="status" class="form-control" style="width:auto;padding:5px 8px;font-size:.78rem">
+                  <option value="Pending" {{ 'selected' if task['status']=='Pending' else '' }}>Pending</option>
+                  <option value="In Progress" {{ 'selected' if task['status']=='In Progress' else '' }}>In Progress</option>
+                  <option value="Completed">Completed</option>
+                </select>
+                <button type="submit" class="btn btn-success btn-sm"><i class="fas fa-check"></i> Update</button>
+              </form>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="empty-state" style="padding:30px">
+            <i class="fas fa-check-double"></i>
+            <p>All tasks completed!</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

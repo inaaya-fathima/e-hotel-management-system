@@ -1,0 +1,148 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Admin Dashboard — E-Hotel{% endblock %}
+{% block page_title %}Dashboard Overview{% endblock %}
+
+{% block content %}
+<div class="panel-header anim-fade-up">
+  <h1>Dashboard <span class="text-accent">Overview</span></h1>
+  <p>Welcome back, <strong>{{ session.admin_name }}</strong>! Here's your hotel at a glance.</p>
+</div>
+
+<!-- ── STATS ──────────────────────────────────────── -->
+<div class="stats-grid anim-fade-up-delay-1">
+  <div class="stat-card">
+    <div class="stat-icon cyan"><i class="fas fa-door-open"></i></div>
+    <div><div class="stat-value">{{ total_rooms }}</div><div class="stat-label">Total Rooms</div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
+    <div><div class="stat-value">{{ available_rooms }}</div><div class="stat-label">Available</div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon red"><i class="fas fa-bed"></i></div>
+    <div><div class="stat-value">{{ occupied_rooms }}</div><div class="stat-label">Occupied</div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon blue"><i class="fas fa-users"></i></div>
+    <div><div class="stat-value">{{ total_customers }}</div><div class="stat-label">Customers</div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon purple"><i class="fas fa-calendar-check"></i></div>
+    <div><div class="stat-value">{{ total_bookings }}</div><div class="stat-label">Total Bookings</div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon orange"><i class="fas fa-clock"></i></div>
+    <div><div class="stat-value">{{ pending_bookings }}</div><div class="stat-label">Pending</div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon blue"><i class="fas fa-concierge-bell"></i></div>
+    <div><div class="stat-value">{{ pending_services }}</div><div class="stat-label">Pending Services</div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon green"><i class="fas fa-rupee-sign"></i></div>
+    <div><div class="stat-value">₹{{ "%.0f"|format(total_revenue) }}</div><div class="stat-label">Total Revenue</div></div>
+  </div>
+</div>
+
+<!-- ── QUICK ACTIONS + RECENT BOOKINGS ──────────────── -->
+<div class="grid-2">
+  <!-- Quick Actions -->
+  <div class="card anim-fade-up-delay-2">
+    <div class="card-header"><h2 class="card-title"><i class="fas fa-bolt text-accent"></i> Quick Actions</h2></div>
+    <div class="quick-actions">
+      <a href="{{ url_for('admin_add_room') }}" class="quick-action-card" style="text-decoration:none;color:var(--text)">
+        <i class="fas fa-plus-circle"></i><p>Add Room</p>
+      </a>
+      <a href="{{ url_for('admin_bookings') }}" class="quick-action-card" style="text-decoration:none;color:var(--text)">
+        <i class="fas fa-calendar-check"></i><p>Bookings</p>
+      </a>
+      <a href="{{ url_for('admin_add_staff') }}" class="quick-action-card" style="text-decoration:none;color:var(--text)">
+        <i class="fas fa-user-plus"></i><p>Add Staff</p>
+      </a>
+      <a href="{{ url_for('admin_billing') }}" class="quick-action-card" style="text-decoration:none;color:var(--text)">
+        <i class="fas fa-file-invoice"></i><p>Billing</p>
+      </a>
+      <a href="{{ url_for('admin_services') }}" class="quick-action-card" style="text-decoration:none;color:var(--text)">
+        <i class="fas fa-concierge-bell"></i><p>Services</p>
+      </a>
+      <a href="{{ url_for('admin_customers') }}" class="quick-action-card" style="text-decoration:none;color:var(--text)">
+        <i class="fas fa-users"></i><p>Customers</p>
+      </a>
+    </div>
+  </div>
+
+  <!-- Room Availability Visual -->
+  <div class="card anim-fade-up-delay-2">
+    <div class="card-header"><h2 class="card-title"><i class="fas fa-chart-pie text-accent"></i> Room Status</h2></div>
+    {% set total = total_rooms if total_rooms > 0 else 1 %}
+    <div style="display:flex;flex-direction:column;gap:16px">
+      {% for label, count, color in [
+        ('Available', available_rooms, 'var(--success)'),
+        ('Occupied', occupied_rooms, 'var(--danger)'),
+        ('Maintenance', total_rooms - available_rooms - occupied_rooms, 'var(--warning)')
+      ] %}
+      <div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:.85rem">
+          <span style="color:{{ color }}">● {{ label }}</span>
+          <span style="font-weight:600">{{ count }}</span>
+        </div>
+        <div style="height:8px;background:var(--bg3);border-radius:4px;overflow:hidden">
+          <div style="height:100%;width:{{ [(count / total * 100)|round, 0]|max }}%;background:{{ color }};border-radius:4px;transition:width .6s ease"></div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- ── RECENT BOOKINGS ──────────────────────────────── -->
+<div class="card mt-3 anim-fade-up-delay-3">
+  <div class="card-header">
+    <h2 class="card-title"><i class="fas fa-history text-accent"></i> Recent Bookings</h2>
+    <a href="{{ url_for('admin_bookings') }}" class="btn btn-outline btn-sm">View All</a>
+  </div>
+  {% if recent_bookings %}
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th><th>Customer</th><th>Room</th><th>Check-In</th><th>Check-Out</th><th>Total</th><th>Status</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for b in recent_bookings %}
+        <tr>
+          <td style="color:var(--text2)">#{{ b['id'] }}</td>
+          <td style="font-weight:600">{{ b['cust_name'] }}</td>
+          <td>Room {{ b['room_number'] }}</td>
+          <td>{{ b['check_in'] }}</td>
+          <td>{{ b['check_out'] }}</td>
+          <td style="color:var(--accent);font-weight:600">₹{{ "%.0f"|format(b['total_price']) }}</td>
+          <td>
+            {% set s = b['status'] %}
+            <span class="status-pill {{ 'pill-pending' if s=='Pending' else 'pill-confirmed' if s=='Confirmed' else 'pill-rejected' if s=='Rejected' else 'pill-checked' }}">
+              {{ s }}
+            </span>
+          </td>
+          <td>
+            {% if b['status'] == 'Pending' %}
+            <form method="post" action="{{ url_for('admin_approve_booking', booking_id=b['id']) }}" style="display:inline">
+              <button class="btn btn-success btn-sm">Approve</button>
+            </form>
+            <form method="post" action="{{ url_for('admin_reject_booking', booking_id=b['id']) }}" style="display:inline">
+              <button class="btn btn-danger btn-sm">Reject</button>
+            </form>
+            {% else %}
+            <span class="text-muted">—</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state"><i class="fas fa-calendar-times"></i><p>No bookings yet.</p></div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Admin Panel — E-Hotel{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/panel.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+<div class="panel-layout">
+
+  <!-- ── SIDEBAR ─────────────────────────────────── -->
+  <aside class="sidebar" id="adminSidebar">
+    <div class="sidebar-brand">
+      <h1><i class="fas fa-hotel"></i> E-Hotel</h1>
+      <p>Admin Control Panel</p>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="sidebar-nav-section">Overview</div>
+      <a href="{{ url_for('admin_dashboard') }}" class="sidebar-nav-item">
+        <i class="fas fa-tachometer-alt"></i> Dashboard
+      </a>
+
+      <div class="sidebar-nav-section">Management</div>
+      <a href="{{ url_for('admin_rooms') }}" class="sidebar-nav-item">
+        <i class="fas fa-door-open"></i> Rooms
+      </a>
+      <a href="{{ url_for('admin_bookings') }}" class="sidebar-nav-item">
+        <i class="fas fa-calendar-check"></i> Bookings
+      </a>
+      <a href="{{ url_for('admin_customers') }}" class="sidebar-nav-item">
+        <i class="fas fa-users"></i> Customers
+      </a>
+      <a href="{{ url_for('admin_staff') }}" class="sidebar-nav-item">
+        <i class="fas fa-id-badge"></i> Staff
+      </a>
+      <a href="{{ url_for('admin_attendance') }}" class="sidebar-nav-item">
+        <i class="fas fa-clipboard-user"></i> Attendance
+      </a>
+
+      <div class="sidebar-nav-section">Finance & Services</div>
+      <a href="{{ url_for('admin_billing') }}" class="sidebar-nav-item">
+        <i class="fas fa-file-invoice-dollar"></i> Billing
+      </a>
+      <a href="{{ url_for('admin_services') }}" class="sidebar-nav-item">
+        <i class="fas fa-concierge-bell"></i> Services
+      </a>
+
+      <div class="sidebar-nav-section">Portals</div>
+      <a href="{{ url_for('index') }}" class="sidebar-nav-item">
+        <i class="fas fa-globe"></i> Customer Site
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-avatar">{{ session.admin_name[0].upper() if session.admin_name else 'A' }}</div>
+        <div class="sidebar-user-info">
+          <strong>{{ session.admin_name or 'Admin' }}</strong>
+          <small>Administrator</small>
+        </div>
+        <a href="{{ url_for('admin_logout') }}" title="Logout" style="color:var(--danger);margin-left:auto">
+          <i class="fas fa-sign-out-alt"></i>
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── MAIN CONTENT ─────────────────────────────── -->
+  <div style="flex:1;display:flex;flex-direction:column;overflow:hidden">
+    <div class="topbar">
+      <div class="topbar-left">
+        <button id="sidebarToggle" class="btn btn-icon btn-outline" style="padding:8px">
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="topbar-title">{% block page_title %}Dashboard{% endblock %}</div>
+      </div>
+      <div class="topbar-right">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}{% for cat, msg in messages %}
+        <div class="alert alert-{{ 'danger' if cat=='error' else cat }}" style="margin:0;padding:8px 14px;font-size:.82rem">{{ msg }}</div>
+        {% endfor %}{% endif %}{% endwith %}
+        <div class="topbar-user">
+          <div class="sidebar-avatar" style="width:30px;height:30px;font-size:.8rem">
+            {{ session.admin_name[0].upper() if session.admin_name else 'A' }}
+          </div>
+          <span style="font-size:.85rem">{{ session.admin_name or 'Admin' }}</span>
+        </div>
+        <a href="{{ url_for('admin_logout') }}" class="btn btn-danger btn-sm">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+      </div>
+    </div>
+
+    <main class="panel-content">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+
+</div>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script>
+  // Mark active sidebar link
+  document.querySelectorAll('.sidebar-nav-item').forEach(link => {
+    if (link.getAttribute('href') === window.location.pathname) {
+      link.classList.add('active');
+    }
+  });
+</script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

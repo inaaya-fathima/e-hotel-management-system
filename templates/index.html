@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% block title %}E-Hotel — Luxury Stays Await{% endblock %}
+
+{% block content %}
+
+<!-- ══ HERO ══════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="particles" id="heroParticles"></div>
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-tag"><i class="fas fa-star"></i> Premium Hotel Management</div>
+      <h1>Experience <span>Luxury</span><br>Like Never Before</h1>
+      <p>Browse handpicked rooms, make instant bookings, and enjoy world-class hospitality — all in one seamless platform.</p>
+      <div class="hero-actions">
+        <a href="{{ url_for('browse_rooms') }}" class="btn btn-primary">
+          <i class="fas fa-search"></i> Browse Rooms
+        </a>
+        {% if 'user_id' not in session %}
+        <a href="{{ url_for('customer_signup') }}" class="btn btn-outline">
+          <i class="fas fa-user-plus"></i> Create Account
+        </a>
+        {% else %}
+        <a href="{{ url_for('customer_dashboard') }}" class="btn btn-outline">
+          <i class="fas fa-tachometer-alt"></i> My Dashboard
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ STATS BAR ═══════════════════════════════════════════ -->
+<div style="background:var(--bg2); border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
+  <div class="container">
+    <div style="display:grid; grid-template-columns:repeat(4,1fr); text-align:center; padding:28px 0; gap:20px;">
+      <div>
+        <div style="font-size:2rem;font-weight:800;color:var(--accent)">500+</div>
+        <div style="color:var(--text2);font-size:.85rem">Happy Guests</div>
+      </div>
+      <div>
+        <div style="font-size:2rem;font-weight:800;color:var(--accent)">50+</div>
+        <div style="color:var(--text2);font-size:.85rem">Premium Rooms</div>
+      </div>
+      <div>
+        <div style="font-size:2rem;font-weight:800;color:var(--accent)">4.9★</div>
+        <div style="color:var(--text2);font-size:.85rem">Average Rating</div>
+      </div>
+      <div>
+        <div style="font-size:2rem;font-weight:800;color:var(--accent)">24/7</div>
+        <div style="color:var(--text2);font-size:.85rem">Room Service</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ FEATURED ROOMS ═══════════════════════════════════════ -->
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <h2>Available <span>Rooms</span></h2>
+      <p>Choose from our curated selection of luxury accommodations</p>
+      <div class="section-line"></div>
+    </div>
+
+    {% if rooms %}
+    <div class="rooms-grid">
+      {% for room in rooms %}
+      <div class="room-card anim-fade-up">
+        <div class="room-card-img">
+          {% if room['image_url'] %}
+          <img src="{{ room['image_url'] }}" alt="Room {{ room['room_number'] }}" loading="lazy">
+          {% else %}
+          <img src="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=600" alt="Room">
+          {% endif %}
+          <span class="room-type-badge">{{ room['room_type'] }}</span>
+          {% if 'user_id' in session %}
+          <button class="wish-btn" data-room-id="{{ room['id'] }}" title="Add to Wishlist">
+            <i class="far fa-heart"></i>
+          </button>
+          {% endif %}
+        </div>
+        <div class="room-card-body">
+          <div class="room-card-title">Room {{ room['room_number'] }}</div>
+          <div class="room-card-desc">{{ room['description'] or 'Comfortable and elegant room.' }}</div>
+          <div class="room-card-footer">
+            <div class="room-price">₹{{ "%.0f"|format(room['price']) }}<span>/night</span></div>
+            <a href="{{ url_for('room_detail', room_id=room['id']) }}" class="btn btn-outline btn-sm">View Details</a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="text-center mt-3">
+      <a href="{{ url_for('browse_rooms') }}" class="btn btn-primary">View All Rooms <i class="fas fa-arrow-right"></i></a>
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <i class="fas fa-bed"></i>
+      <p>No rooms available at the moment. Check back soon!</p>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- ══ ROOM TYPES ════════════════════════════════════════════ -->
+<section class="section" style="background:var(--bg2); border-top:1px solid var(--border);">
+  <div class="container">
+    <div class="section-header">
+      <h2>Room <span>Categories</span></h2>
+      <p>Find the perfect room for every occasion</p>
+      <div class="section-line"></div>
+    </div>
+    <div class="grid-4">
+      {% for rtype, icon, desc in [('Single','fa-user','Perfect solo retreat'),('Double','fa-user-friends','Ideal for couples'),('Deluxe','fa-crown','Premium comfort'),('Suite','fa-gem','Ultimate luxury')] %}
+      <a href="{{ url_for('browse_rooms', type=rtype) }}" class="card" style="text-align:center;text-decoration:none;color:var(--text)">
+        <div style="font-size:2.5rem;color:var(--accent);margin-bottom:16px"><i class="fas {{ icon }}"></i></div>
+        <h3 style="font-size:1.1rem;margin-bottom:8px">{{ rtype }}</h3>
+        <p style="color:var(--text2);font-size:.85rem">{{ desc }}</p>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ══ WHY CHOOSE US ═════════════════════════════════════════ -->
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <h2>Why Choose <span>E-Hotel?</span></h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="grid-3">
+      {% for icon, title, desc in [
+        ('fa-shield-alt','Secure Booking','Your bookings and data are protected with enterprise-grade security.'),
+        ('fa-clock','24/7 Service','Our staff is available around the clock to serve all your needs.'),
+        ('fa-star','Premium Quality','Every room is inspected and maintained to the highest standards.')
+      ] %}
+      <div class="card text-center">
+        <div style="font-size:2.4rem;color:var(--accent);margin-bottom:16px"><i class="fas {{ icon }}"></i></div>
+        <h3 style="font-size:1.05rem;margin-bottom:10px">{{ title }}</h3>
+        <p style="color:var(--text2);font-size:.85rem;line-height:1.7">{{ desc }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ══ CTA ════════════════════════════════════════════════════ -->
+<section class="section" style="background:var(--bg2);border-top:1px solid var(--border);">
+  <div class="container text-center">
+    <h2 style="font-size:2rem;font-weight:800;margin-bottom:14px">Ready to Book Your Stay?</h2>
+    <p style="color:var(--text2);margin-bottom:28px;font-size:1rem">Create an account or login to access exclusive rates and instant booking.</p>
+    {% if 'user_id' not in session %}
+    <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+      <a href="{{ url_for('customer_signup') }}" class="btn btn-primary">Get Started <i class="fas fa-rocket"></i></a>
+      <a href="{{ url_for('admin_login') }}" class="btn btn-outline"><i class="fas fa-user-shield"></i> Admin Login</a>
+      <a href="{{ url_for('staff_login') }}" class="btn btn-outline"><i class="fas fa-id-badge"></i> Staff Login</a>
+    </div>
+    {% else %}
+    <a href="{{ url_for('browse_rooms') }}" class="btn btn-primary">Browse Rooms Now <i class="fas fa-arrow-right"></i></a>
+    {% endif %}
+  </div>
+</section>
+
+{% endblock %}

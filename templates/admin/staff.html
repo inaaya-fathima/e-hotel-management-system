@@ -1,0 +1,59 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Staff — Admin{% endblock %}
+{% block page_title %}Staff Management{% endblock %}
+
+{% block content %}
+<div class="action-bar anim-fade-up">
+  <div class="panel-header" style="margin:0">
+    <h1>Staff <span class="text-accent">Management</span></h1>
+    <p>Manage hotel employees and their roles</p>
+  </div>
+  <a href="{{ url_for('admin_add_staff') }}" class="btn btn-primary">
+    <i class="fas fa-user-plus"></i> Add Staff
+  </a>
+</div>
+
+{% if staff %}
+<div class="card anim-fade-up-delay-1" style="padding:0">
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr><th>Name</th><th>Role</th><th>Username</th><th>Contact</th><th>Salary</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        {% for s in staff %}
+        <tr>
+          <td>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="sidebar-avatar" style="width:34px;height:34px;font-size:.85rem;background:linear-gradient(135deg,var(--accent3),var(--accent2))">
+                {{ s['name'][0].upper() }}
+              </div>
+              <strong>{{ s['name'] }}</strong>
+            </div>
+          </td>
+          <td><span class="badge badge-secondary">{{ s['role'] }}</span></td>
+          <td style="color:var(--text2)">{{ s['username'] }}</td>
+          <td style="color:var(--text2)">{{ s['contact'] or '—' }}</td>
+          <td style="color:var(--success);font-weight:600">₹{{ "%.0f"|format(s['salary']) }}</td>
+          <td>
+            <div style="display:flex;gap:8px">
+              <a href="{{ url_for('admin_edit_staff', staff_id=s['id']) }}" class="btn btn-warning btn-sm">
+                <i class="fas fa-edit"></i>
+              </a>
+              <form method="post" action="{{ url_for('admin_delete_staff', staff_id=s['id']) }}" style="display:inline">
+                <button class="btn btn-danger btn-sm" data-confirm="Remove {{ s['name'] }} from staff?">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% else %}
+<div class="card"><div class="empty-state"><i class="fas fa-id-badge"></i><p>No staff members found.</p></div></div>
+{% endif %}
+{% endblock %}

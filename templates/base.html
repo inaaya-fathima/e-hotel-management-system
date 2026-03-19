@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}E-Hotel Management System{% endblock %}</title>
+  <meta name="description" content="{% block meta_desc %}Premium Hotel Management System{% endblock %}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+  <!-- ── NAVBAR ───────────────────────────────────── -->
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="{{ url_for('index') }}" class="navbar-brand">
+        <i class="fas fa-hotel"></i><span>E-<span>Hotel</span></span>
+      </a>
+      <ul class="navbar-nav" id="mainNav">
+        <li><a href="{{ url_for('index') }}"><i class="fas fa-home"></i> Home</a></li>
+        <li><a href="{{ url_for('browse_rooms') }}"><i class="fas fa-door-open"></i> Rooms</a></li>
+        {% if 'user_id' in session %}
+        <li><a href="{{ url_for('customer_dashboard') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        {% endif %}
+      </ul>
+      <div class="navbar-actions">
+        {% if 'user_id' in session %}
+          <span style="color:var(--text2);font-size:.85rem;">
+            <i class="fas fa-user-circle" style="color:var(--accent)"></i>
+            {{ session.user_name }}
+          </span>
+          <a href="{{ url_for('customer_logout') }}" class="btn btn-outline btn-sm">Logout</a>
+        {% else %}
+          <a href="{{ url_for('customer_login') }}" class="btn btn-outline btn-sm">Login</a>
+          <a href="{{ url_for('customer_signup') }}" class="btn btn-primary btn-sm">Sign Up</a>
+        {% endif %}
+        <button class="hamburger" id="hamburgerBtn" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── FLASH MESSAGES ───────────────────────────── -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="container" style="padding-top:16px">
+    {% for category, message in messages %}
+    <div class="alert alert-{{ 'danger' if category == 'error' else category }}">
+      <i class="fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-circle' if category == 'warning' else 'info-circle' if category == 'info' else 'times-circle' }}"></i>
+      {{ message }}
+      <span class="alert-close"><i class="fas fa-times"></i></span>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% endwith %}
+
+  <!-- ── PAGE CONTENT ─────────────────────────────── -->
+  {% block content %}{% endblock %}
+
+  <!-- ── FOOTER ───────────────────────────────────── -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <h3><i class="fas fa-hotel"></i> E-Hotel</h3>
+          <p>Your premium destination for luxury stays. Experience world-class hospitality with modern comforts and exceptional service.</p>
+          <div class="footer-social">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+        <div class="footer-links">
+          <h4>Quick Links</h4>
+          <a href="{{ url_for('index') }}">Home</a>
+          <a href="{{ url_for('browse_rooms') }}">Browse Rooms</a>
+          <a href="{{ url_for('customer_login') }}">Customer Login</a>
+          <a href="{{ url_for('customer_signup') }}">Sign Up</a>
+        </div>
+        <div class="footer-links">
+          <h4>Portals</h4>
+          <a href="{{ url_for('admin_login') }}">Admin Panel</a>
+          <a href="{{ url_for('staff_login') }}">Staff Portal</a>
+        </div>
+        <div class="footer-links">
+          <h4>Room Types</h4>
+          <a href="{{ url_for('browse_rooms', type='Single') }}">Single Rooms</a>
+          <a href="{{ url_for('browse_rooms', type='Double') }}">Double Rooms</a>
+          <a href="{{ url_for('browse_rooms', type='Deluxe') }}">Deluxe Rooms</a>
+          <a href="{{ url_for('browse_rooms', type='Suite') }}">Suites</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2024 E-Hotel Management System &mdash; College Project | Built with Flask &amp; SQLite</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

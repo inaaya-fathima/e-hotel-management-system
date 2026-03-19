@@ -1,0 +1,96 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Billing — Admin{% endblock %}
+{% block page_title %}Billing & Accounts{% endblock %}
+
+{% block content %}
+<div class="panel-header anim-fade-up">
+  <h1>Billing &amp; <span class="text-accent">Accounts</span></h1>
+  <p>Track payments and manage bills</p>
+</div>
+
+<!-- Revenue Summary -->
+<div class="stats-grid anim-fade-up-delay-1" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr))">
+  <div class="stat-card">
+    <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
+    <div><div class="stat-value">₹{{ "%.0f"|format(total_paid) }}</div><div class="stat-label">Total Paid</div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon orange"><i class="fas fa-clock"></i></div>
+    <div><div class="stat-value">₹{{ "%.0f"|format(total_pending) }}</div><div class="stat-label">Pending</div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon cyan"><i class="fas fa-rupee-sign"></i></div>
+    <div><div class="stat-value">₹{{ "%.0f"|format(total_paid + total_pending) }}</div><div class="stat-label">Total Billed</div></div>
+  </div>
+</div>
+
+{% if bills %}
+<div class="card anim-fade-up-delay-2" style="padding:0">
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Bill #</th><th>Customer</th><th>Room</th><th>Check-In</th>
+          <th>Room Charge</th><th>Service Charge</th><th>Total</th><th>Payment</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for bill in bills %}
+        <tr>
+          <td style="color:var(--text2)">#{{ bill['id'] }}</td>
+          <td><strong>{{ bill['cust_name'] }}</strong></td>
+          <td>{{ bill['room_number'] }}</td>
+          <td style="color:var(--text2)">{{ bill['check_in'] }}</td>
+          <td>₹{{ "%.0f"|format(bill['room_charges']) }}</td>
+          <td style="color:var(--accent2)">₹{{ "%.0f"|format(bill['service_charges']) }}</td>
+          <td style="color:var(--accent);font-weight:700">₹{{ "%.0f"|format(bill['total_amount']) }}</td>
+          <td>
+            <span class="status-pill {{ 'pill-paid' if bill['payment_status']=='Paid' else 'pill-pending' }}">
+              {{ bill['payment_status'] }}
+            </span>
+          </td>
+          <td>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              {% if bill['payment_status'] == 'Pending' %}
+              <form method="post" action="{{ url_for('admin_mark_paid', bill_id=bill['id']) }}" style="display:inline">
+                <button class="btn btn-success btn-sm"><i class="fas fa-check"></i> Mark Paid</button>
+              </form>
+              <button class="btn btn-outline btn-sm" data-modal="svc-modal-{{ bill['id'] }}">
+                <i class="fas fa-plus"></i> Add Charge
+              </button>
+              {% else %}
+              <span class="text-muted" style="font-size:.8rem">Paid</span>
+              {% endif %}
+            </div>
+
+            <!-- Add Service Charge Modal -->
+            {% if bill['payment_status'] == 'Pending' %}
+            <div class="modal-overlay" id="svc-modal-{{ bill['id'] }}">
+              <div class="modal">
+                <div class="modal-header">
+                  <span class="modal-title">Add Service Charge — Bill #{{ bill['id'] }}</span>
+                  <span class="modal-close"><i class="fas fa-times"></i></span>
+                </div>
+                <form method="post" action="{{ url_for('admin_add_service_charge', bill_id=bill['id']) }}">
+                  <div class="form-group">
+                    <label class="form-label">Service Charge Amount (₹)</label>
+                    <input type="number" class="form-control" name="charge" min="0" placeholder="500" required>
+                  </div>
+                  <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center">
+                    <i class="fas fa-plus-circle"></i> Add Charge
+                  </button>
+                </form>
+              </div>
+            </div>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% else %}
+<div class="card"><div class="empty-state"><i class="fas fa-file-invoice-dollar"></i><p>No bills generated yet.</p></div></div>
+{% endif %}
+{% endblock %}

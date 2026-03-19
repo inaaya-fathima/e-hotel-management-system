@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% block title %}Room {{ room['room_number'] }} — E-Hotel{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container">
+    <!-- Back -->
+    <a href="{{ url_for('browse_rooms') }}" class="btn btn-outline btn-sm mb-3">
+      <i class="fas fa-arrow-left"></i> Back to Rooms
+    </a>
+
+    <!-- Hero Image -->
+    <div class="room-detail-hero">
+      <img src="{{ room['image_url'] or 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1200' }}"
+           alt="Room {{ room['room_number'] }}">
+      <div class="overlay">
+        <span class="room-type-badge" style="position:static;display:inline-block;margin-bottom:8px">
+          {{ room['room_type'] }}
+        </span>
+        <h1 style="font-size:2rem;font-weight:800;">Room {{ room['room_number'] }}</h1>
+        <div style="color:rgba(255,255,255,.8);font-size:.9rem">{{ room['description'] }}</div>
+      </div>
+    </div>
+
+    <div class="room-info-grid">
+      <!-- LEFT: Info + Reviews -->
+      <div>
+        <!-- Room Details Card -->
+        <div class="card mb-3">
+          <div class="card-header">
+            <h2 class="card-title"><i class="fas fa-info-circle text-accent"></i> Room Details</h2>
+            {% if 'user_id' in session %}
+            <button class="wish-btn {{ 'active' if in_wishlist else '' }}"
+                    data-room-id="{{ room['id'] }}"
+                    style="position:static;width:auto;height:auto;border-radius:var(--radius);padding:8px 16px;gap:6px;display:flex;align-items:center;font-size:.85rem;">
+              <i class="{{ 'fas' if in_wishlist else 'far' }} fa-heart"></i>
+              {{ 'Wishlisted' if in_wishlist else 'Add to Wishlist' }}
+            </button>
+            {% endif %}
+          </div>
+          <div class="grid-2">
+            {% for label, val in [
+              ('Room Number', room['room_number']),
+              ('Type', room['room_type']),
+              ('Price/Night', '₹' + "%.0f"|format(room['price'])),
+              ('Status', room['status'])
+            ] %}
+            <div>
+              <div class="text-muted">{{ label }}</div>
+              <div style="font-weight:600;margin-top:4px">{{ val }}</div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Reviews -->
+        <div class="card mb-3">
+          <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-star text-accent"></i> Guest Reviews</h3>
+            {% if avg_rating %}
+            <div style="color:var(--warning);font-weight:700">
+              ★ {{ "%.1f"|format(avg_rating) }} ({{ reviews|length }} reviews)
+            </div>
+            {% endif %}
+          </div>
+          {% if reviews %}
+            {% for review in reviews %}
+            <div style="padding:16px 0;border-bottom:1px solid var(--border)">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div class="sidebar-avatar">{{ review['user_name'][0].upper() }}</div>
+                  <div>
+                    <div style="font-weight:600;font-size:.9rem">{{ review['user_name'] }}</div>
+                    <div class="text-muted">{{ review['created_at'][:10] }}</div>
+                  </div>
+                </div>
+                <div class="stars">
+                  {% for i in range(1, 6) %}
+                  <span class="star {{ 'filled' if i <= review['rating'] else '' }}">★</span>
+                  {% endfor %}
+                </div>
+              </div>
+              <p style="color:var(--text2);font-size:.88rem">{{ review['comment'] }}</p>
+            </div>
+            {% endfor %}
+          {% else %}
+          <div class="empty-state" style="padding:30px">
+            <i class="fas fa-comment-slash"></i>
+            <p>No reviews yet. Be the first!</p>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Submit Review -->
+        {% if 'user_id' in session %}
+        <div class="card">
+          <div class="card-header"><h3 class="card-title"><i class="fas fa-pen text-accent"></i> Write a Review</h3></div>
+          <form method="post" action="{{ url_for('submit_review', room_id=room['id']) }}">
+            <div class="form-group">
+              <label class="form-label">Rating</label>
+              <div class="star-input" style="flex-direction:row-reverse;justify-content:flex-end">
+                {% for i in [5,4,3,2,1] %}
+                <input type="radio" id="star{{ i }}" name="rating" value="{{ i }}" required>
+                <label for="star{{ i }}">★</label>
+                {% endfor %}
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Your Review</label>
+              <textarea class="form-control" name="comment" placeholder="Share your experience..." required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Submit Review</button>
+          </form>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- RIGHT: Booking Sidebar -->
+      <div>
+        <div class="card" style="position:sticky;top:90px">
+          <h3 style="font-size:1.2rem;margin-bottom:4px">Book This Room</h3>
+          <div class="room-price" style="font-size:1.8rem;margin-bottom:20px">
+            ₹{{ "%.0f"|format(room['price']) }}<span>/night</span>
+          </div>
+
+          {% if room['status'] == 'Available' %}
+            {% if 'user_id' in session %}
+            <a href="{{ url_for('book_room', room_id=room['id']) }}" class="btn btn-primary" style="width:100%;justify-content:center">
+              <i class="fas fa-calendar-check"></i> Book Now
+            </a>
+            {% else %}
+            <a href="{{ url_for('customer_login') }}" class="btn btn-primary" style="width:100%;justify-content:center">
+              <i class="fas fa-sign-in-alt"></i> Login to Book
+            </a>
+            {% endif %}
+          {% else %}
+          <div class="badge badge-danger" style="font-size:.85rem;padding:10px 16px;border-radius:var(--radius);display:block;text-align:center">
+            <i class="fas fa-ban"></i> Room {{ room['status'] }}
+          </div>
+          {% endif %}
+
+          <div style="margin-top:24px;display:flex;flex-direction:column;gap:12px">
+            {% for icon, text in [
+              ('fa-shield-alt','Secure booking'),
+              ('fa-clock','Instant confirmation'),
+              ('fa-undo','Free cancellation*'),
+              ('fa-headset','24/7 support')
+            ] %}
+            <div style="display:flex;align-items:center;gap:10px;font-size:.85rem;color:var(--text2)">
+              <i class="fas {{ icon }}" style="color:var(--accent);width:16px"></i> {{ text }}
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

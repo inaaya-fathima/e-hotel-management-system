@@ -1,0 +1,50 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Customers — Admin{% endblock %}
+{% block page_title %}Customer Management{% endblock %}
+
+{% block content %}
+<div class="panel-header anim-fade-up">
+  <h1>Customer <span class="text-accent">Management</span></h1>
+  <p>View and manage all registered customers</p>
+</div>
+
+{% if customers %}
+<div class="card anim-fade-up-delay-1" style="padding:0">
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr><th>#</th><th>Name</th><th>Email</th><th>Phone</th><th>Bookings</th><th>Registered</th><th>Action</th></tr>
+      </thead>
+      <tbody>
+        {% for c in customers %}
+        <tr>
+          <td style="color:var(--text2)">#{{ c['id'] }}</td>
+          <td>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="sidebar-avatar" style="width:34px;height:34px;font-size:.85rem">{{ c['name'][0].upper() }}</div>
+              <strong>{{ c['name'] }}</strong>
+            </div>
+          </td>
+          <td style="color:var(--text2)">{{ c['email'] }}</td>
+          <td style="color:var(--text2)">{{ c['phone'] or '—' }}</td>
+          <td>
+            <span class="badge badge-info">{{ c['total_bookings'] }} bookings</span>
+          </td>
+          <td style="color:var(--text2);font-size:.82rem">{{ c['created_at'][:10] }}</td>
+          <td>
+            <form method="post" action="{{ url_for('admin_delete_customer', user_id=c['id']) }}" style="display:inline">
+              <button class="btn btn-danger btn-sm" data-confirm="Delete customer {{ c['name'] }}? This cannot be undone.">
+                <i class="fas fa-trash"></i>
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% else %}
+<div class="card"><div class="empty-state"><i class="fas fa-users-slash"></i><p>No customers registered yet.</p></div></div>
+{% endif %}
+{% endblock %}

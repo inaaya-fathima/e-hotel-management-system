@@ -1,0 +1,69 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Bookings — Admin{% endblock %}
+{% block page_title %}Booking Management{% endblock %}
+
+{% block content %}
+<div class="panel-header anim-fade-up">
+  <h1>Booking <span class="text-accent">Management</span></h1>
+  <p>Approve, reject, and manage all customer bookings</p>
+</div>
+
+{% if bookings %}
+<div class="card anim-fade-up-delay-1" style="padding:0">
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th><th>Customer</th><th>Room</th><th>Type</th>
+          <th>Check-In</th><th>Check-Out</th><th>Total</th><th>Status</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for b in bookings %}
+        <tr>
+          <td style="color:var(--text2)">#{{ b['id'] }}</td>
+          <td>
+            <div style="font-weight:600">{{ b['cust_name'] }}</div>
+            <div class="text-muted">{{ b['cust_email'] }}</div>
+          </td>
+          <td><strong>{{ b['room_number'] }}</strong></td>
+          <td><span class="badge badge-info">{{ b['room_type'] }}</span></td>
+          <td>{{ b['check_in'] }}</td>
+          <td>{{ b['check_out'] }}</td>
+          <td style="color:var(--accent);font-weight:700">₹{{ "%.0f"|format(b['total_price']) }}</td>
+          <td>
+            {% set s = b['status'] %}
+            <span class="status-pill {{ 'pill-pending' if s=='Pending' else 'pill-confirmed' if s=='Confirmed' else 'pill-rejected' if s=='Rejected' else 'pill-checked' }}">
+              {{ s }}
+            </span>
+          </td>
+          <td>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              {% if b['status'] == 'Pending' %}
+              <form method="post" action="{{ url_for('admin_approve_booking', booking_id=b['id']) }}" style="display:inline">
+                <button class="btn btn-success btn-sm"><i class="fas fa-check"></i> Approve</button>
+              </form>
+              <form method="post" action="{{ url_for('admin_reject_booking', booking_id=b['id']) }}" style="display:inline">
+                <button class="btn btn-danger btn-sm"><i class="fas fa-times"></i> Reject</button>
+              </form>
+              {% elif b['status'] == 'Confirmed' %}
+              <form method="post" action="{{ url_for('admin_checkout', booking_id=b['id']) }}" style="display:inline">
+                <button class="btn btn-warning btn-sm" data-confirm="Mark this booking as checked out?">
+                  <i class="fas fa-sign-out-alt"></i> Checkout
+                </button>
+              </form>
+              {% else %}
+              <span class="text-muted" style="font-size:.8rem">—</span>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% else %}
+<div class="card"><div class="empty-state"><i class="fas fa-calendar-times"></i><p>No bookings found.</p></div></div>
+{% endif %}
+{% endblock %}

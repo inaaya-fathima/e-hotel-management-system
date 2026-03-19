@@ -1,0 +1,63 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}{{ 'Edit' if member else 'Add' }} Staff — Admin{% endblock %}
+{% block page_title %}{{ 'Edit' if member else 'Add' }} Staff{% endblock %}
+
+{% block content %}
+<div class="action-bar anim-fade-up">
+  <div class="panel-header" style="margin:0">
+    <h1>{{ 'Edit' if member else 'Add New' }} <span class="text-accent">Staff</span></h1>
+  </div>
+  <a href="{{ url_for('admin_staff') }}" class="btn btn-outline">
+    <i class="fas fa-arrow-left"></i> Back to Staff
+  </a>
+</div>
+
+<div class="card anim-fade-up-delay-1" style="max-width:700px">
+  <form method="post">
+    <div class="grid-2">
+      <div class="form-group">
+        <label class="form-label">Full Name *</label>
+        <input type="text" class="form-control" name="name"
+               value="{{ member['name'] if member else '' }}" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Role *</label>
+        <select class="form-control" name="role" required>
+          {% for r in ['Receptionist','Housekeeping','Manager','Security','Chef','Maintenance','Concierge'] %}
+          <option value="{{ r }}" {{ 'selected' if member and member['role']==r else '' }}>{{ r }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="form-group">
+        <label class="form-label">Username *</label>
+        <input type="text" class="form-control" name="username"
+               value="{{ member['username'] if member else '' }}" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Contact</label>
+        <input type="tel" class="form-control" name="contact"
+               value="{{ member['contact'] if member else '' }}" placeholder="9876543210">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Salary (₹)</label>
+      <input type="number" class="form-control" name="salary"
+             value="{{ member['salary'] if member else '' }}" placeholder="25000" min="0">
+    </div>
+    {% if not member %}
+    <div class="form-group">
+      <label class="form-label">Password *</label>
+      <input type="password" class="form-control" name="password" placeholder="Temporary password" required>
+    </div>
+    {% endif %}
+    <div style="display:flex;gap:12px">
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-save"></i> {{ 'Update' if member else 'Add Staff' }}
+      </button>
+      <a href="{{ url_for('admin_staff') }}" class="btn btn-outline">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

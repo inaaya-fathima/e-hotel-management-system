@@ -1,0 +1,61 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Rooms — Admin{% endblock %}
+{% block page_title %}Room Management{% endblock %}
+
+{% block content %}
+<div class="action-bar anim-fade-up">
+  <div class="panel-header" style="margin:0">
+    <h1>Room <span class="text-accent">Management</span></h1>
+    <p>Add, edit, and manage all hotel rooms</p>
+  </div>
+  <a href="{{ url_for('admin_add_room') }}" class="btn btn-primary">
+    <i class="fas fa-plus"></i> Add New Room
+  </a>
+</div>
+
+{% if rooms %}
+<div class="card anim-fade-up-delay-1" style="padding:0">
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Room No.</th><th>Type</th><th>Price/Night</th><th>Status</th><th>Description</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for room in rooms %}
+        <tr>
+          <td><strong>{{ room['room_number'] }}</strong></td>
+          <td>
+            <span class="badge badge-info">{{ room['room_type'] }}</span>
+          </td>
+          <td style="color:var(--accent);font-weight:600">₹{{ "%.0f"|format(room['price']) }}</td>
+          <td>
+            <span class="status-pill {{ 'pill-available' if room['status']=='Available' else 'pill-occupied' if room['status']=='Occupied' else 'pill-maintenance' }}">
+              <span class="status-dot {{ 'dot-available' if room['status']=='Available' else 'dot-occupied' if room['status']=='Occupied' else 'dot-maintenance' }}"></span>
+              {{ room['status'] }}
+            </span>
+          </td>
+          <td style="color:var(--text2);font-size:.85rem">{{ room['description'][:50] + '...' if room['description'] and room['description']|length > 50 else room['description'] or '—' }}</td>
+          <td>
+            <div style="display:flex;gap:8px">
+              <a href="{{ url_for('admin_edit_room', room_id=room['id']) }}" class="btn btn-warning btn-sm">
+                <i class="fas fa-edit"></i>
+              </a>
+              <form method="post" action="{{ url_for('admin_delete_room', room_id=room['id']) }}" style="display:inline">
+                <button type="submit" class="btn btn-danger btn-sm" data-confirm="Delete Room {{ room['room_number'] }}?">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% else %}
+<div class="card"><div class="empty-state"><i class="fas fa-door-closed"></i><p>No rooms found. Add your first room!</p></div></div>
+{% endif %}
+{% endblock %}

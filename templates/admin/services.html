@@ -1,0 +1,54 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Services — Admin{% endblock %}
+{% block page_title %}Room Service Monitoring{% endblock %}
+
+{% block content %}
+<div class="panel-header anim-fade-up">
+  <h1>Room Service <span class="text-accent">Monitoring</span></h1>
+  <p>Track and update all guest service requests</p>
+</div>
+
+{% if services %}
+<div class="card anim-fade-up-delay-1" style="padding:0">
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr><th>#</th><th>Customer</th><th>Room</th><th>Service</th><th>Description</th><th>Requested</th><th>Status</th><th>Update</th></tr>
+      </thead>
+      <tbody>
+        {% for svc in services %}
+        <tr>
+          <td style="color:var(--text2)">#{{ svc['id'] }}</td>
+          <td><strong>{{ svc['cust_name'] }}</strong></td>
+          <td>{{ svc['room_number'] }}</td>
+          <td>
+            <span class="badge badge-info">{{ svc['service_type'] }}</span>
+          </td>
+          <td style="color:var(--text2);font-size:.82rem">{{ svc['description'][:40] + '...' if svc['description'] and svc['description']|length > 40 else svc['description'] or '—' }}</td>
+          <td style="color:var(--text2);font-size:.82rem">{{ svc['created_at'][:16] }}</td>
+          <td>
+            {% set s = svc['status'] %}
+            <span class="status-pill {{ 'pill-pending' if s=='Pending' else 'pill-inprogress' if s=='In Progress' else 'pill-completed' }}">
+              {{ s }}
+            </span>
+          </td>
+          <td>
+            <form method="post" action="{{ url_for('admin_update_service', service_id=svc['id']) }}" style="display:flex;gap:6px">
+              <select name="status" class="form-control" style="width:auto;padding:6px 10px;font-size:.8rem">
+                {% for st in ['Pending','In Progress','Completed'] %}
+                <option value="{{ st }}" {{ 'selected' if svc['status']==st else '' }}>{{ st }}</option>
+                {% endfor %}
+              </select>
+              <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-sync"></i></button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% else %}
+<div class="card"><div class="empty-state"><i class="fas fa-bell-slash"></i><p>No service requests found.</p></div></div>
+{% endif %}
+{% endblock %}

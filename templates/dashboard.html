@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="max-width: 1200px; margin: 0 auto;">
+    <h2 style="color: var(--primary-green); border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px;">My Dashboard</h2>
+    
+    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+        <!-- Profile Section -->
+        <div class="modern-card" style="flex: 1; min-width: 300px;">
+            <h3 style="color: var(--primary-green); margin-bottom: 15px;">Profile Details</h3>
+            <div id="profile-container" style="color: var(--text-light);">
+                <p>Loading Profile...</p>
+            </div>
+            <button class="btn-primary" style="margin-top: 15px; padding: 10px; font-size: 0.9rem;" onclick="showModal('edit-profile-modal')">Edit Profile</button>
+        </div>
+
+        <!-- Bookings Section -->
+        <div class="modern-card" style="flex: 2; min-width: 300px;">
+            <h3 style="color: var(--primary-green); margin-bottom: 15px;">My Bookings</h3>
+            <div id="bookings-container" style="color: var(--text-light); overflow-x: auto;">
+                <p>Loading Bookings...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/static/js/dashboard.js"></script>
+{% endblock %}

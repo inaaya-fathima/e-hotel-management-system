@@ -1,0 +1,58 @@
+<div class="modal-overlay" id="booking-modal">
+    <div class="auth-box">
+        <div class="auth-doodle-side">
+            <div class="auth-doodle-content">
+                <i class="fa-solid fa-suitcase-rolling"></i>
+            </div>
+        </div>
+        <div class="auth-form-side">
+            <h2 class="auth-title">Reserve Your Stay</h2>
+            <form id="bookingForm">
+                <input type="hidden" id="book-hotel-id">
+                <input type="hidden" id="book-room-type-id">
+                
+                <h3 id="book-room-name" style="color: var(--primary-green); margin-bottom: 5px;"></h3>
+                <p id="book-price-info" style="margin-bottom: 20px; font-weight: bold; color: var(--text-light);"></p>
+                
+                <div style="display: flex; gap: 10px;">
+                    <div class="form-group" style="flex: 1;">
+                        <input type="date" id="book-checkin" class="form-control" required title="Check In">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <input type="date" id="book-checkout" class="form-control" required title="Check Out">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <input type="number" id="book-guests" class="form-control" min="1" value="1" required placeholder="Number of Guests">
+                </div>
+                
+                <button type="submit" class="btn-primary" style="margin-top: 10px;">Confirm & Pay</button>
+                <button type="button" class="btn-primary" style="background:transparent; color: var(--text-muted); margin-top: 10px; border: 1px solid var(--text-muted);" onclick="hideModal('booking-modal')">Cancel</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="payment-modal">
+    <div class="auth-box">
+        <div class="auth-doodle-side">
+            <div class="auth-doodle-content">
+                <i class="fa-brands fa-cc-visa"></i>
+            </div>
+        </div>
+        <div class="auth-form-side" style="text-align: center;">
+            <h2 class="auth-title">Payment Gateway</h2>
+            <p style="margin-bottom: 20px; color: var(--text-muted);">Secure SSL Checkout.</p>
+            <p id="pay-amount-display" style="font-size: 2rem; color: var(--primary-green); font-weight: bold; margin-bottom: 20px; text-shadow: var(--neon-glow);"></p>
+            
+            <form id="paymentForm">
+                <input type="hidden" id="pay-booking-id">
+                <div class="form-group">
+                    <input type="text" id="pay-card" class="form-control" placeholder="Card Number (Mock)" required>
+                </div>
+                <button type="submit" class="btn-primary">Pay Now</button>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Browse Rooms — E-Hotel{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="panel-header anim-fade-up">
+      <h1>Browse <span class="text-accent">Rooms</span></h1>
+      <p>Explore our collection of available rooms and suites</p>
+    </div>
+
+    <!-- Filter Bar -->
+    <form method="get" action="{{ url_for('browse_rooms') }}">
+      <div class="filter-bar anim-fade-up-delay-1">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" name="search" placeholder="Search rooms..." value="{{ request.args.get('search','') }}">
+        </div>
+        {% for t in ['', 'Single', 'Double', 'Deluxe', 'Suite'] %}
+        <button type="submit" name="type" value="{{ t }}"
+          class="filter-btn {{ 'active' if selected_type == t else '' }}">
+          {{ 'All' if not t else t }}
+        </button>
+        {% endfor %}
+      </div>
+    </form>
+
+    {% if rooms %}
+    <div class="rooms-grid">
+      {% for room in rooms %}
+      <div class="room-card">
+        <div class="room-card-img">
+          <img src="{{ room['image_url'] or 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=600' }}"
+               alt="Room {{ room['room_number'] }}" loading="lazy">
+          <span class="room-type-badge">{{ room['room_type'] }}</span>
+          {% if 'user_id' in session %}
+          <button class="wish-btn" data-room-id="{{ room['id'] }}" title="Wishlist">
+            <i class="far fa-heart"></i>
+          </button>
+          {% endif %}
+        </div>
+        <div class="room-card-body">
+          <div class="room-card-title">Room {{ room['room_number'] }}</div>
+          <div class="room-card-desc">{{ room['description'] or 'Comfortable room.' }}</div>
+          <div class="room-card-footer">
+            <div class="room-price">₹{{ "%.0f"|format(room['price']) }}<span>/night</span></div>
+            <a href="{{ url_for('room_detail', room_id=room['id']) }}" class="btn btn-outline btn-sm">View</a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <i class="fas fa-search"></i>
+      <p>No rooms found matching your criteria.</p>
+      <a href="{{ url_for('browse_rooms') }}" class="btn btn-outline mt-2">Clear Filters</a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
