@@ -11,6 +11,7 @@
   <a href="{{ url_for('admin_add_room') }}" class="btn btn-primary">
     <i class="fas fa-plus"></i> Add New Room
   </a>
+
 </div>
 
 {% if rooms %}
@@ -19,7 +20,12 @@
     <table>
       <thead>
         <tr>
-          <th>Room No.</th><th>Type</th><th>Price/Night</th><th>Status</th><th>Description</th><th>Actions</th>
+          <th>Room No.</th>
+          <th>Type</th>
+          <th>Price/Night</th>
+          <th>Status</th>
+          <th>Description</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -31,19 +37,24 @@
           </td>
           <td style="color:var(--accent);font-weight:600">₹{{ "%.0f"|format(room['price']) }}</td>
           <td>
-            <span class="status-pill {{ 'pill-available' if room['status']=='Available' else 'pill-occupied' if room['status']=='Occupied' else 'pill-maintenance' }}">
-              <span class="status-dot {{ 'dot-available' if room['status']=='Available' else 'dot-occupied' if room['status']=='Occupied' else 'dot-maintenance' }}"></span>
+            <span
+              class="status-pill {{ 'pill-available' if room['status']=='Available' else 'pill-occupied' if room['status']=='Occupied' else 'pill-maintenance' }}">
+              <span
+                class="status-dot {{ 'dot-available' if room['status']=='Available' else 'dot-occupied' if room['status']=='Occupied' else 'dot-maintenance' }}"></span>
               {{ room['status'] }}
             </span>
           </td>
-          <td style="color:var(--text2);font-size:.85rem">{{ room['description'][:50] + '...' if room['description'] and room['description']|length > 50 else room['description'] or '—' }}</td>
+          <td style="color:var(--text2);font-size:.85rem">{{ room['description'][:50] + '...' if room['description'] and
+            room['description']|length > 50 else room['description'] or '—' }}</td>
           <td>
             <div style="display:flex;gap:8px">
               <a href="{{ url_for('admin_edit_room', room_id=room['id']) }}" class="btn btn-warning btn-sm">
                 <i class="fas fa-edit"></i>
               </a>
-              <form method="post" action="{{ url_for('admin_delete_room', room_id=room['id']) }}" style="display:inline">
-                <button type="submit" class="btn btn-danger btn-sm" data-confirm="Delete Room {{ room['room_number'] }}?">
+              <form method="post" action="{{ url_for('admin_delete_room', room_id=room['id']) }}"
+                style="display:inline">
+                <button type="submit" class="btn btn-danger btn-sm"
+                  data-confirm="Delete Room {{ room['room_number'] }}?">
                   <i class="fas fa-trash"></i>
                 </button>
               </form>
@@ -56,6 +67,10 @@
   </div>
 </div>
 {% else %}
-<div class="card"><div class="empty-state"><i class="fas fa-door-closed"></i><p>No rooms found. Add your first room!</p></div></div>
+<div class="card">
+  <div class="empty-state"><i class="fas fa-door-closed"></i>
+    <p>No rooms found. Add your first room!</p>
+  </div>
+</div>
 {% endif %}
 {% endblock %}

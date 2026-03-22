@@ -8,19 +8,29 @@
   <p>Track payments and manage bills</p>
 </div>
 
+
 <!-- Revenue Summary -->
 <div class="stats-grid anim-fade-up-delay-1" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr))">
   <div class="stat-card">
     <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
-    <div><div class="stat-value">₹{{ "%.0f"|format(total_paid) }}</div><div class="stat-label">Total Paid</div></div>
+    <div>
+      <div class="stat-value">₹{{ "%.0f"|format(total_paid) }}</div>
+      <div class="stat-label">Total Paid</div>
+    </div>
   </div>
   <div class="stat-card">
     <div class="stat-icon orange"><i class="fas fa-clock"></i></div>
-    <div><div class="stat-value">₹{{ "%.0f"|format(total_pending) }}</div><div class="stat-label">Pending</div></div>
+    <div>
+      <div class="stat-value">₹{{ "%.0f"|format(total_pending) }}</div>
+      <div class="stat-label">Pending</div>
+    </div>
   </div>
   <div class="stat-card">
     <div class="stat-icon cyan"><i class="fas fa-rupee-sign"></i></div>
-    <div><div class="stat-value">₹{{ "%.0f"|format(total_paid + total_pending) }}</div><div class="stat-label">Total Billed</div></div>
+    <div>
+      <div class="stat-value">₹{{ "%.0f"|format(total_paid + total_pending) }}</div>
+      <div class="stat-label">Total Billed</div>
+    </div>
   </div>
 </div>
 
@@ -30,8 +40,15 @@
     <table>
       <thead>
         <tr>
-          <th>Bill #</th><th>Customer</th><th>Room</th><th>Check-In</th>
-          <th>Room Charge</th><th>Service Charge</th><th>Total</th><th>Payment</th><th>Actions</th>
+          <th>Bill #</th>
+          <th>Customer</th>
+          <th>Room</th>
+          <th>Check-In</th>
+          <th>Room Charge</th>
+          <th>Service Charge</th>
+          <th>Total</th>
+          <th>Payment</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -91,6 +108,10 @@
   </div>
 </div>
 {% else %}
-<div class="card"><div class="empty-state"><i class="fas fa-file-invoice-dollar"></i><p>No bills generated yet.</p></div></div>
+<div class="card">
+  <div class="empty-state"><i class="fas fa-file-invoice-dollar"></i>
+    <p>No bills generated yet.</p>
+  </div>
+</div>
 {% endif %}
 {% endblock %}
