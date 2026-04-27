@@ -12,7 +12,7 @@
   </a>
 </div>
 
-<div class="card anim-fade-up-delay-1" style="max-width:700px">
+<div class="card anim-fade-up-delay-1" style="max-width:760px">
   <form method="post">
     <div class="grid-2">
       <div class="form-group">
@@ -23,7 +23,7 @@
       <div class="form-group">
         <label class="form-label">Role *</label>
         <select class="form-control" name="role" required>
-          {% for r in ['Receptionist','Housekeeping','Manager','Security','Chef','Maintenance','Concierge'] %}
+          {% for r in ['Receptionist','Housekeeping','Manager','Security','Chef','Maintenance','Concierge','Bellboy','Spa Therapist','Event Coordinator'] %}
           <option value="{{ r }}" {{ 'selected' if member and member['role']==r else '' }}>{{ r }}</option>
           {% endfor %}
         </select>
@@ -41,10 +41,21 @@
                value="{{ member['contact'] if member else '' }}" placeholder="9876543210">
       </div>
     </div>
-    <div class="form-group">
-      <label class="form-label">Salary (₹)</label>
-      <input type="number" class="form-control" name="salary"
-             value="{{ member['salary'] if member else '' }}" placeholder="25000" min="0">
+    <div class="grid-2">
+      <div class="form-group">
+        <label class="form-label">Monthly Salary (₹)</label>
+        <input type="number" class="form-control" name="salary"
+               value="{{ member['salary'] if member else '' }}" placeholder="25000" min="0">
+      </div>
+      <div class="form-group">
+        <label class="form-label"><i class="fas fa-map-marker-alt" style="color:var(--accent);margin-right:6px;"></i>Assigned Branch *</label>
+        <select class="form-control" name="assigned_branch" required>
+          {% for b in branches %}
+          <option value="{{ b }}" {{ 'selected' if member and member['assigned_branch']==b else '' }}>{{ b }}</option>
+          {% endfor %}
+        </select>
+        <small style="color:var(--text2);font-size:.75rem;margin-top:4px;display:block;">Select the hotel branch where this staff member will work.</small>
+      </div>
     </div>
     {% if not member %}
     <div class="form-group">

@@ -1,45 +1,206 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}E-Hotel Management System{% endblock %}</title>
-  <meta name="description" content="{% block meta_desc %}Premium Hotel Management System{% endblock %}">
+  <title>{% block title %}E-Hotel — Luxury Redefined{% endblock %}</title>
+  <meta name="description"
+    content="{% block meta_desc %}E-Hotel: World-class luxury stays, fine dining, and memorable experiences.{% endblock %}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   {% block extra_css %}{% endblock %}
 </head>
+
 <body>
 
-  <!-- ── NAVBAR ───────────────────────────────────── -->
-  <nav class="navbar">
+  <!-- ── SCROLL PROGRESS BAR ─────────────────────── -->
+  <div id="scroll-progress"></div>
+
+  <!-- ── CUSTOM CURSOR ─────────────────────────────── -->
+  <div id="cursor-dot"></div>
+  <div id="cursor-ring"></div>
+
+  <!-- ── LINE LOADER ─────────────────────────────── -->
+  <div id="loading-screen" style="
+  position:fixed;inset:0;z-index:9999;
+  background:#0a0a0a;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:20px;transition:opacity .5s ease;
+">
+    <div style="font-size:.95rem;letter-spacing:4px;color:#888;text-transform:uppercase;">E-Hotel</div>
+    <div style="width:200px;height:2px;background:#222;border-radius:2px;overflow:hidden;">
+      <div id="loadBar"
+        style="width:0%;height:100%;background:#d39626;border-radius:2px;transition:width .200s linear;">
+      </div>
+    </div>
+    <div id="loadPct" style="font-size:.85rem;letter-spacing:2px;color:#555;">0%</div>
+  </div>
+  <!-- ── MEGA NAVBAR ─────────────────────────────── -->
+  <nav class="navbar" id="mainNavbar">
     <div class="navbar-inner">
       <a href="{{ url_for('index') }}" class="navbar-brand">
-        <i class="fas fa-hotel"></i><span>E-<span>Hotel</span></span>
+        <div class="brand-icon"><i class="fas fa-hotel"></i></div>
+        <span class="brand-name">E-<span>Hotel</span></span>
       </a>
+
       <ul class="navbar-nav" id="mainNav">
-        <li><a href="{{ url_for('index') }}"><i class="fas fa-home"></i> Home</a></li>
-        <li><a href="{{ url_for('browse_rooms') }}"><i class="fas fa-door-open"></i> Rooms</a></li>
+        <!-- Home -->
+        <li>
+          <a href="{{ url_for('index') }}" class="{{ 'nav-active' if request.endpoint == 'index' else '' }}">
+            <i class="fas fa-home nav-icon-sm"></i> Home
+          </a>
+        </li>
+
+        <!-- Destinations -->
+        <li>
+          <a href="/destinations">Destinations</a>
+          <div class="mega-menu" style="width:290px;">
+            <div class="mega-col">
+              <h5>By Region</h5>
+              <a href="/rooms?destination=Jaipur"><i class="fas fa-map-pin"
+                  style="color:var(--accent);margin-right:6px;width:14px;"></i> Jaipur</a>
+              <a href="/rooms?destination=Goa"><i class="fas fa-map-pin"
+                  style="color:var(--accent);margin-right:6px;width:14px;"></i> Goa</a>
+              <a href="/rooms?destination=Kerala"><i class="fas fa-map-pin"
+                  style="color:var(--accent);margin-right:6px;width:14px;"></i> Kerala</a>
+              <a href="/rooms?destination=Himalayas"><i class="fas fa-map-pin"
+                  style="color:var(--accent);margin-right:6px;width:14px;"></i> Himalayas</a>
+              <a href="/rooms?destination=Varanasi"><i class="fas fa-map-pin"
+                  style="color:var(--accent);margin-right:6px;width:14px;"></i> Varanasi</a>
+              <a href="/rooms?destination=Mumbai"><i class="fas fa-map-pin"
+                  style="color:var(--accent);margin-right:6px;width:14px;"></i> Mumbai</a>
+              <a href="/destinations"><i class="fas fa-arrow-right"
+                  style="color:var(--accent);margin-right:6px;width:14px;"></i> All Destinations</a>
+            </div>
+          </div>
+        </li>
+
+
+
+        <!-- Experiences -->
+        <li>
+          <a href="/experiences">Experiences</a>
+          <div class="mega-menu mega-wide">
+            <div class="mega-col">
+              <h5>Dining</h5>
+              <a href="{{ url_for('exp_dining') }}">Fine Dining</a>
+              <a href="{{ url_for('exp_dining') }}#rooftop">Roof-top Restaurant</a>
+              <a href="{{ url_for('exp_meetings') }}">Meetings &amp; Conferences</a>
+              <a href="{{ url_for('exp_wedding') }}">Timeless Weddings</a>
+            </div>
+            <div class="mega-col">
+              <h5>Recreation</h5>
+              <a href="/experiences#wellness">Wellness &amp; Spa</a>
+              <a href="/experiences#pool">Infinity Pool</a>
+              <a href="/experiences#partyhall">Party &amp; Events Hall</a>
+              <a href="{{ url_for('exp_business_lounge') }}">Business Lounge</a>
+            </div>
+            <div class="mega-book-panel">
+              <h4>Book Direct</h4>
+              <p>Exclusive offers only for direct bookings</p>
+              <a href="{{ url_for('browse_rooms') }}">Explore Stays <i class="fas fa-arrow-right"></i></a>
+            </div>
+          </div>
+        </li>
+
+        <!-- Offers -->
+        <li>
+          <a href="/offers">Offers</a>
+          <div class="mega-menu" style="width:260px;">
+            <div class="mega-col">
+              <h5>Packages</h5>
+              <a href="/offers#weekend">Weekend Getaway</a>
+              <a href="/offers#family">Family Holidays</a>
+              <a href="/offers#corporate">Corporate Rates</a>
+              <a href="/offers#seasonal">Seasonal Escapes</a>
+              <a href="/offers">All Offers</a>
+            </div>
+          </div>
+        </li>
+
+        <!-- More -->
+        <li>
+          <a href="/about">More <i class="fas fa-chevron-down nav-arrow"></i></a>
+          <div class="mega-menu mega-wide">
+            <div class="mega-col">
+              <h5>About</h5>
+              <a href="/about">About E-Hotel</a>
+              <a href="{{ url_for('our_story') }}">Our Story</a>
+              <a href="{{ url_for('our_team') }}">Our Team</a>
+              <a href="{{ url_for('awards') }}">Awards &amp; Recognition</a>
+            </div>
+            <div class="mega-col">
+              <h5>Info</h5>
+              <a href="{{ url_for('contact') }}">Contact Us</a>
+              <a href="{{ url_for('sustainability') }}">Sustainability</a>
+              <a href="{{ url_for('careers') }}">Careers</a>
+              <a href="{{ url_for('travel_stories') }}">Travel Stories</a>
+            </div>
+            <div class="mega-col">
+              <h5>Guest</h5>
+              {% if 'user_id' in session %}
+              <a href="{{ url_for('customer_dashboard') }}">My Dashboard</a>
+              <a href="{{ url_for('customer_settings') }}">Account Settings</a>
+              <a href="{{ url_for('customer_logout') }}">Logout</a>
+              {% else %}
+              <a href="{{ url_for('customer_login') }}">Login / Join</a>
+              <a href="{{ url_for('customer_signup') }}">Create Account</a>
+              {% endif %}
+              <a href="{{ url_for('browse_rooms') }}">Manage My Booking</a>
+            </div>
+          </div>
+        </li>
+
         {% if 'user_id' in session %}
-        <li><a href="{{ url_for('customer_dashboard') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        <li><a href="{{ url_for('customer_dashboard') }}"><i class="fas fa-tachometer-alt"></i> My Stays</a></li>
         {% endif %}
       </ul>
+
       <div class="navbar-actions">
         {% if 'user_id' in session %}
-          <span style="color:var(--text2);font-size:.85rem;">
-            <i class="fas fa-user-circle" style="color:var(--accent)"></i>
-            {{ session.user_name }}
-          </span>
-          <a href="{{ url_for('customer_logout') }}" class="btn btn-outline btn-sm">Logout</a>
+        <span style="font-size:.8rem;color:var(--text2);letter-spacing:.5px;">
+          <i class="fas fa-user-circle" style="color:var(--accent)"></i>
+          {{ session.user_name }}
+        </span>
+        <a href="{{ url_for('customer_logout') }}" class="nav-login-link">Logout</a>
         {% else %}
-          <a href="{{ url_for('customer_login') }}" class="btn btn-outline btn-sm">Login</a>
-          <a href="{{ url_for('customer_signup') }}" class="btn btn-primary btn-sm">Sign Up</a>
+        <a href="{{ url_for('customer_login') }}" class="nav-login-link">Login / Join</a>
         {% endif %}
+        <a href="{{ url_for('destinations') }}" class="btn-book-stay">
+          <i class="fas fa-bed"></i> Book a Stay
+        </a>
         <button class="hamburger" id="hamburgerBtn" aria-label="Menu">
           <span></span><span></span><span></span>
         </button>
       </div>
     </div>
+  </nav>
+
+  <!-- ── MOBILE NAV OVERLAY ────────────────────────── -->
+  <div class="mobile-nav-overlay" id="mobileOverlay"></div>
+  <nav class="mobile-nav" id="mobileNav" aria-label="Mobile Navigation">
+    <button class="mobile-nav-close" id="mobileNavClose" aria-label="Close menu">✕</button>
+    <a href="{{ url_for('index') }}"><i class="fas fa-home"></i> Home</a>
+    <a href="/destinations"><i class="fas fa-map-marker-alt"></i> Destinations</a>
+    <a href="/experiences"><i class="fas fa-concierge-bell"></i> Experiences</a>
+    <a href="/offers"><i class="fas fa-tags"></i> Offers</a>
+    <a href="/about"><i class="fas fa-info-circle"></i> About</a>
+    <a href="{{ url_for('contact') }}"><i class="fas fa-envelope"></i> Contact</a>
+    <div style="border-top:2px solid var(--accent);margin:12px 0;"></div>
+    {% if 'user_id' in session %}
+    <a href="{{ url_for('customer_dashboard') }}"><i class="fas fa-tachometer-alt"></i> My Dashboard</a>
+    <a href="{{ url_for('customer_settings') }}"><i class="fas fa-cog"></i> Settings</a>
+    <a href="{{ url_for('customer_logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    {% else %}
+    <a href="{{ url_for('customer_login') }}"><i class="fas fa-sign-in-alt"></i> Login</a>
+    <a href="{{ url_for('customer_signup') }}"><i class="fas fa-user-plus"></i> Sign Up</a>
+    {% endif %}
+    <a href="{{ url_for('destinations') }}"
+      style="margin-top:16px;background:var(--accent);color:#fff;padding:12px 16px;border-radius:4px;font-weight:700;">
+      <i class="fas fa-bed"></i> Book a Stay
+    </a>
   </nav>
 
   <!-- ── FLASH MESSAGES ───────────────────────────── -->
@@ -48,7 +209,8 @@
   <div class="container" style="padding-top:16px">
     {% for category, message in messages %}
     <div class="alert alert-{{ 'danger' if category == 'error' else category }}">
-      <i class="fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-circle' if category == 'warning' else 'info-circle' if category == 'info' else 'times-circle' }}"></i>
+      <i
+        class="fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-circle' if category == 'warning' else 'info-circle' if category == 'info' else 'times-circle' }}"></i>
       {{ message }}
       <span class="alert-close"><i class="fas fa-times"></i></span>
     </div>
@@ -66,41 +228,54 @@
       <div class="footer-grid">
         <div class="footer-brand">
           <h3><i class="fas fa-hotel"></i> E-Hotel</h3>
-          <p>Your premium destination for luxury stays. Experience world-class hospitality with modern comforts and exceptional service.</p>
+          <p>Your ultimate destination for timeless luxury, world-class hospitality, and unforgettable experiences.
+            Every stay is a celebration.</p>
           <div class="footer-social">
             <a href="#"><i class="fab fa-facebook-f"></i></a>
             <a href="#"><i class="fab fa-twitter"></i></a>
             <a href="#"><i class="fab fa-instagram"></i></a>
-            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+            <a href="#"><i class="fab fa-youtube"></i></a>
           </div>
         </div>
         <div class="footer-links">
-          <h4>Quick Links</h4>
+          <h4>Navigate</h4>
           <a href="{{ url_for('index') }}">Home</a>
+          <a href="/destinations">Destinations</a>
           <a href="{{ url_for('browse_rooms') }}">Browse Rooms</a>
-          <a href="{{ url_for('customer_login') }}">Customer Login</a>
-          <a href="{{ url_for('customer_signup') }}">Sign Up</a>
+          <a href="/experiences">Experiences</a>
+          <a href="/offers">Offers</a>
+          <a href="/about">About Us</a>
         </div>
         <div class="footer-links">
-          <h4>Portals</h4>
-          <a href="{{ url_for('admin_login') }}">Admin Panel</a>
-          <a href="{{ url_for('staff_login') }}">Staff Portal</a>
+          <h4>Destinations</h4>
+          <a href="/rooms?destination=Jaipur">Jaipur</a>
+          <a href="/rooms?destination=Goa">Goa</a>
+          <a href="/rooms?destination=Kerala">Kerala</a>
+          <a href="/rooms?destination=Himalayas">Himalayas</a>
+          <a href="/rooms?destination=Varanasi">Varanasi</a>
+          <a href="/rooms?destination=Mumbai">Mumbai</a>
         </div>
         <div class="footer-links">
-          <h4>Room Types</h4>
-          <a href="{{ url_for('browse_rooms', type='Single') }}">Single Rooms</a>
-          <a href="{{ url_for('browse_rooms', type='Double') }}">Double Rooms</a>
-          <a href="{{ url_for('browse_rooms', type='Deluxe') }}">Deluxe Rooms</a>
-          <a href="{{ url_for('browse_rooms', type='Suite') }}">Suites</a>
+          <h4>Help</h4>
+          <a href="/about#contact">Contact Us</a>
+          <a href="{{ url_for('customer_login') }}">Login</a>
+          <a href="{{ url_for('customer_signup') }}">Create Account</a>
+          <a href="/about#faq">FAQs</a>
         </div>
       </div>
       <div class="footer-bottom">
-        <p>&copy; 2024 E-Hotel Management System &mdash; College Project | Built with Flask &amp; SQLite</p>
+        <p>&copy; 2024 E-Hotel &mdash; A Legacy of Luxury | Built with Flask &amp; SQLite</p>
       </div>
     </div>
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
+  <script src="https://unpkg.com/split-type"></script>
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>
   {% block extra_js %}{% endblock %}
 </body>
+
 </html>

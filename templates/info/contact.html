@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Contact Us — E-Hotel{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container" style="max-width:760px;margin:0 auto;">
+    <div class="section-header centered anim-fade-up">
+      <div class="section-tag" style="justify-content:center;"><i class="fas fa-envelope"></i>&nbsp; Get In Touch</div>
+      <h1>Contact <span>Us</span></h1>
+      <div class="section-line centered"></div>
+      <p style="margin-top:12px;">Have a query, special request, or need help with your booking? Our team is available 7 days a week.</p>
+    </div>
+
+    <!-- Contact Form -->
+    <div class="card anim-fade-up-delay-1">
+      <div class="card-header">
+        <h2 class="card-title"><i class="fas fa-paper-plane text-accent"></i> Send Us a Message</h2>
+      </div>
+
+      <form method="post" action="{{ url_for('contact') }}">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div class="form-group">
+            <label class="form-label">Your Name *</label>
+            <input type="text" name="name" class="form-control" required
+                   value="{{ session.get('user_name', '') }}" placeholder="John Doe">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Address *</label>
+            <input type="email" name="email" class="form-control" required placeholder="you@example.com">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Subject</label>
+          <select name="subject" class="form-control">
+            <option value="">Select a topic...</option>
+            <option>Booking Enquiry</option>
+            <option>Special Requests</option>
+            <option>Wedding / Events</option>
+            <option>Corporate Rates</option>
+            <option>Feedback & Complaints</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Your Message *</label>
+          <textarea name="message" class="form-control" rows="5" required
+                    placeholder="Please describe your query or request in detail..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-paper-plane"></i> Send Message
+        </button>
+      </form>
+    </div>
+
+    <!-- Contact Info -->
+    <div class="grid-3 anim-fade-up-delay-2" style="margin-top:32px;gap:16px;">
+      {% for icon, title, val in [
+        ('fa-phone','Call Us','+91 98765 43210'),
+        ('fa-envelope','Email','reservations@ehotel.in'),
+        ('fa-clock','Hours','24/7 Front Desk')
+      ] %}
+      <div class="card" style="text-align:center;padding:24px 16px;">
+        <div style="font-size:2rem;color:var(--accent);margin-bottom:10px;"><i class="fas {{ icon }}"></i></div>
+        <div style="font-size:.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--text2);margin-bottom:6px;">{{ title }}</div>
+        <div style="font-weight:600;font-size:.95rem;">{{ val }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% block extra_css %}
+<style>
+@media (max-width: 600px) {
+  form > div[style*="grid-template-columns"] { grid-template-columns: 1fr !important; }
+}
+</style>
+{% endblock %}
+{% endblock %}

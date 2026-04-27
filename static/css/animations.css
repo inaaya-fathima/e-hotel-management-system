@@ -1,0 +1,404 @@
+/* ═══════════════════════════════════════════════════════
+   E-HOTEL — PREMIUM ANIMATION LIBRARY
+   Corporate-level micro-interactions & scroll effects
+═══════════════════════════════════════════════════════ */
+
+/* ── Smooth Scroll Override ────────────────────────── */
+html {
+  scroll-behavior: auto; /* Lenis handles this */
+}
+
+/* ── Custom cursor ─────────────────────────────────── */
+*, *::before, *::after { cursor: none !important; }
+
+#cursor-dot {
+  position: fixed;
+  width: 8px; height: 8px;
+  background: var(--accent);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99999;
+  transform: translate(-50%, -50%);
+  transition: transform 0.1s, width 0.3s, height 0.3s, background 0.3s;
+  mix-blend-mode: multiply;
+}
+#cursor-ring {
+  position: fixed;
+  width: 36px; height: 36px;
+  border: 1.5px solid rgba(201,168,76,0.6);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99998;
+  transform: translate(-50%, -50%);
+  transition: transform 0.12s cubic-bezier(.25,.46,.45,.94),
+              width 0.3s, height 0.3s, border-color 0.3s;
+}
+body.cursor-hover #cursor-dot  { width: 14px; height: 14px; background: var(--accent2); }
+body.cursor-hover #cursor-ring { width: 54px; height: 54px; border-color: var(--accent); }
+
+/* ── Horizontal scroll strip ───────────────────────── */
+.h-scroll-track {
+  display: flex;
+  gap: 24px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 12px 0 24px;
+  cursor: grab;
+}
+.h-scroll-track::-webkit-scrollbar { display: none; }
+.h-scroll-track:active { cursor: grabbing; }
+.h-scroll-item {
+  flex: 0 0 320px;
+  scroll-snap-align: start;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  position: relative;
+}
+.h-scroll-item img {
+  width: 100%; height: 240px;
+  object-fit: cover;
+  transition: transform 0.7s cubic-bezier(.25,.46,.45,.94);
+}
+.h-scroll-item:hover img { transform: scale(1.07); }
+
+/* ── Image rotate-on-scroll (applied via JS) ───────── */
+.parallax-rotate img {
+  will-change: transform;
+  transition: none;
+}
+
+/* ── Magnetic button effect ─────────────────────────── */
+.btn-magnetic {
+  position: relative;
+  display: inline-flex;
+  overflow: hidden;
+  transition: transform 0.4s cubic-bezier(.25,.46,.45,.94);
+}
+.btn-magnetic::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.12);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s cubic-bezier(.25,.46,.45,.94);
+}
+.btn-magnetic:hover::after { transform: scaleX(1); }
+
+/* ── Reveal on scroll (base state) ─────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(50px);
+  transition: opacity 0.8s cubic-bezier(.25,.46,.45,.94),
+              transform 0.8s cubic-bezier(.25,.46,.45,.94);
+}
+.reveal.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-left {
+  opacity: 0;
+  transform: translateX(-60px);
+  transition: opacity 0.8s cubic-bezier(.25,.46,.45,.94),
+              transform 0.8s cubic-bezier(.25,.46,.45,.94);
+}
+.reveal-left.in-view { opacity: 1; transform: translateX(0); }
+.reveal-right {
+  opacity: 0;
+  transform: translateX(60px);
+  transition: opacity 0.8s cubic-bezier(.25,.46,.45,.94),
+              transform 0.8s cubic-bezier(.25,.46,.45,.94);
+}
+.reveal-right.in-view { opacity: 1; transform: translateX(0); }
+.reveal-scale {
+  opacity: 0;
+  transform: scale(0.88);
+  transition: opacity 0.9s cubic-bezier(.25,.46,.45,.94),
+              transform 0.9s cubic-bezier(.25,.46,.45,.94);
+}
+.reveal-scale.in-view { opacity: 1; transform: scale(1); }
+
+.delay-1 { transition-delay: 0.12s !important; }
+.delay-2 { transition-delay: 0.24s !important; }
+.delay-3 { transition-delay: 0.36s !important; }
+.delay-4 { transition-delay: 0.48s !important; }
+.delay-5 { transition-delay: 0.60s !important; }
+
+/* ── Glitch title (hero headline special) ───────────── */
+@keyframes glitch-1 {
+  0%,100% { clip-path: inset(0 0 95% 0); transform: translateX(-4px); }
+  20% { clip-path: inset(30% 0 55% 0); transform: translateX(4px); }
+  40% { clip-path: inset(70% 0 10% 0); transform: translateX(-2px); }
+  60% { clip-path: inset(5% 0 80% 0); transform: translateX(3px); }
+  80% { clip-path: inset(50% 0 40% 0); transform: translateX(-4px); }
+}
+@keyframes glitch-2 {
+  0%,100% { clip-path: inset(80% 0 10% 0); transform: translateX(3px); }
+  25% { clip-path: inset(20% 0 65% 0); transform: translateX(-3px); }
+  50% { clip-path: inset(55% 0 35% 0); transform: translateX(2px); }
+  75% { clip-path: inset(10% 0 85% 0); transform: translateX(-2px); }
+}
+
+/* ── Gold shimmer text ──────────────────────────────── */
+@keyframes goldShimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+.gold-shimmer-text {
+  background: linear-gradient(
+    90deg,
+    var(--accent-dark) 0%,
+    var(--accent2)     25%,
+    #fff7d6            50%,
+    var(--accent2)     75%,
+    var(--accent-dark) 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: goldShimmer 3s linear infinite;
+}
+
+/* ── Number counter animation ───────────────────────── */
+.count-up { display: inline-block; }
+
+/* ── Typewriter cursor ──────────────────────────────── */
+@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0;} }
+.typewriter-cursor {
+  display: inline-block;
+  width: 3px;
+  height: 1em;
+  background: var(--accent);
+  margin-left: 4px;
+  vertical-align: middle;
+  animation: blink 0.8s step-end infinite;
+}
+
+/* ── Marquee strip ──────────────────────────────────── */
+@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 30s linear infinite;
+  will-change: transform;
+}
+.marquee-track:hover { animation-play-state: paused; }
+.marquee-item {
+  white-space: nowrap;
+  padding: 0 40px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--accent);
+  border-right: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.marquee-item i { font-size: 0.7rem; }
+.marquee-wrap {
+  overflow: hidden;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 18px 0;
+  background: var(--bg2);
+}
+
+/* ── Card tilt effect (done via JS) ─────────────────── */
+.tilt-card {
+  transform-style: preserve-3d;
+  transition: transform 0.1s ease;
+}
+.tilt-card .tilt-inner {
+  transform: translateZ(20px);
+}
+
+/* ── Image hover color reveal (grayscale → color) ───── */
+.img-reveal img {
+  filter: grayscale(80%) brightness(0.9);
+  transition: filter 0.6s cubic-bezier(.25,.46,.45,.94),
+              transform 0.7s cubic-bezier(.25,.46,.45,.94);
+}
+.img-reveal:hover img {
+  filter: grayscale(0%) brightness(1.05);
+  transform: scale(1.04);
+}
+
+/* ── Floating orbs (background ambiance) ───────────── */
+@keyframes floatOrb {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%       { transform: translate(30px, -40px) scale(1.05); }
+  66%       { transform: translate(-20px, 20px) scale(0.96); }
+}
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.18;
+  pointer-events: none;
+  animation: floatOrb 12s ease-in-out infinite;
+  z-index: 0;
+}
+.orb-gold { background: var(--accent); }
+.orb-light { background: var(--accent3); animation-delay: -4s; }
+
+/* ── Section divider wave ───────────────────────────── */
+.wave-divider {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 80px;
+  overflow: hidden;
+}
+.wave-divider svg { display: block; }
+
+/* ── Scroll progress bar ────────────────────────────── */
+#scroll-progress {
+  position: fixed;
+  top: 0; left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent-dark), var(--accent2));
+  z-index: 99997;
+  width: 0%;
+  transition: width 0.1s linear;
+  box-shadow: 0 0 12px rgba(201,168,76,0.6);
+}
+
+/* ── Enhanced navbar scroll state ──────────────────── */
+.navbar.scrolled {
+  box-shadow: 0 4px 30px rgba(0,0,0,0.1);
+  border-bottom-color: var(--accent);
+}
+.navbar.scrolled .navbar-inner { height: 60px; }
+.navbar .navbar-inner { transition: height 0.3s cubic-bezier(.25,.46,.45,.94); }
+
+/* ── Enhanced hover on nav items ───────────────────── */
+.navbar-nav > li > a {
+  position: relative;
+}
+.navbar-nav > li > a::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 16px; right: 16px;
+  height: 2px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.35s cubic-bezier(.25,.46,.45,.94);
+}
+.navbar-nav > li > a:hover::after,
+.navbar-nav > li > a.active::after { transform: scaleX(1); }
+
+/* ── Enhanced room card hover ───────────────────────── */
+.room-card {
+  transition: transform 0.5s cubic-bezier(.25,.46,.45,.94),
+              box-shadow 0.5s cubic-bezier(.25,.46,.45,.94),
+              border-color 0.3s ease;
+}
+.room-card:hover {
+  transform: translateY(-10px) rotateX(2deg);
+  box-shadow: 0 24px 60px rgba(201,168,76,0.22);
+}
+
+/* ── Enhanced img-card ──────────────────────────────── */
+.img-card {
+  transition: box-shadow 0.5s ease;
+}
+.img-card:hover {
+  box-shadow: 0 20px 50px rgba(201,168,76,0.25);
+}
+
+/* ── Booking btn pulse ──────────────────────────────── */
+@keyframes btnPulse {
+  0% { box-shadow: 0 0 0 0 rgba(201,168,76,0.5); }
+  70% { box-shadow: 0 0 0 14px rgba(201,168,76,0); }
+  100% { box-shadow: 0 0 0 0 rgba(201,168,76,0); }
+}
+.btn-primary:not(:disabled) {
+  animation: btnPulse 2.5s infinite;
+}
+.btn-primary:hover { animation: none; }
+
+/* ── Stats counter wrapper ──────────────────────────── */
+.stat-number-anim {
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+.stat-number-anim:hover { transform: scale(1.1); color: var(--accent2); }
+
+/* ── Kinetic heading chars (split type) ─────────────── */
+.kinetic-title .char {
+  display: inline-block;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+.kinetic-title:hover .char:nth-child(odd) {
+  color: var(--accent);
+  transform: translateY(-4px);
+}
+.kinetic-title:hover .char:nth-child(even) {
+  transform: translateY(4px);
+}
+
+/* ── Premium loading screen override ───────────────── */
+#loading-screen {
+  background: #0a0800;
+}
+
+/* ── Text stroke effect ─────────────────────────────── */
+.text-stroke {
+  -webkit-text-stroke: 1.5px var(--accent);
+  color: transparent;
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 700;
+}
+
+/* ── Venue booking form card ────────────────────────── */
+.venue-booking-card {
+  background: linear-gradient(135deg, #fffdf7 0%, #faf5e8 100%);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  box-shadow: 0 20px 60px rgba(201,168,76,0.15);
+  position: relative;
+  overflow: hidden;
+}
+.venue-booking-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent-dark), var(--accent2), var(--accent-dark));
+}
+
+/* ── Glass card effect ──────────────────────────────── */
+.glass-card {
+  background: rgba(255,255,255,0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(201,168,76,0.2);
+  border-radius: var(--radius-lg);
+}
+
+/* ── Feature list icon animate ──────────────────────── */
+.feature-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(201,168,76,0.1);
+  transition: padding-left 0.3s ease, color 0.3s ease;
+}
+.feature-list li:hover { padding-left: 8px; color: var(--accent-dark); }
+.feature-list li i { color: var(--accent); margin-top: 2px; flex-shrink: 0; }
+
+/* ── Responsive adjustments ─────────────────────────── */
+@media (max-width: 768px) {
+  #cursor-dot, #cursor-ring { display: none; }
+  *, *::before, *::after { cursor: auto !important; }
+  .h-scroll-item { flex: 0 0 260px; }
+  .venue-booking-card { padding: 24px 16px; }
+}

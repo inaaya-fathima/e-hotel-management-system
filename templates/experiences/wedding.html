@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% block title %}Timeless Weddings — Experiences | E-Hotel{% endblock %}
+{% block content %}
+
+<div style="position:relative;height:70vh;overflow:hidden;display:flex;align-items:flex-end;">
+  <img src="{{ url_for('static', filename='img/wedding_hall.png') }}" alt="Weddings"
+    style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(10,6,0,.95),rgba(0,0,0,.2));"></div>
+  <div class="container" style="position:relative;z-index:1;padding-bottom:70px;">
+    <div class="section-tag" style="color:var(--accent2);"><i class="fas fa-heart"></i>&nbsp; A Dream Come True</div>
+    <h1 style="font-family:'Cormorant Garamond',serif;font-size:clamp(2.8rem,6vw,5rem);color:#fff;font-weight:700;line-height:1.05;">
+      Timeless <span style="color:var(--accent2);">Weddings</span>
+    </h1>
+    <p style="color:rgba(255,255,255,.75);margin-top:12px;max-width:560px;font-size:1.05rem;line-height:1.7;">
+      Grand celebrations crafted to perfection. Where every detail tells your love story.
+    </p>
+  </div>
+</div>
+
+<!-- Horizontal scroll venue showcase -->
+<section class="section" style="background:var(--bg2);padding-bottom:40px;">
+  <div class="container">
+    <div class="section-header centered">
+      <div class="section-tag" style="justify-content:center;"><i class="fas fa-star"></i>&nbsp; Our Venues</div>
+      <h2>Iconic Venues for <span>Iconic Moments</span></h2>
+      <div class="section-line centered"></div>
+    </div>
+    <div class="h-scroll-track">
+      {% for name, cap, img, desc in [
+        ('Maharaja Ballroom','Up to 600 guests','wedding_hall.png','Grand pillared hall with crystal chandeliers and marble flooring'),
+        ('Garden Pavilion','Up to 300 guests','dest1.png','Open-air ceremonies under a canopy of fairy lights and stars'),
+        ('Royal Terrace','Up to 150 guests','rooftop.png','Rooftop venue with panoramic city skyline as your backdrop'),
+        ('Intimate Chapel','Up to 80 guests','history.png','A serene, intimate setting for close-knit ceremonies')
+      ] %}
+      <div class="h-scroll-item">
+        <img src="{{ url_for('static', filename='img/' + img) }}" alt="{{ name }}">
+        <div class="img-card-overlay" style="position:absolute;bottom:0;left:0;right:0;padding:20px;background:linear-gradient(transparent,rgba(0,0,0,.85));">
+          <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:#fff;margin-bottom:4px;">{{ name }}</h3>
+          <p style="font-size:.8rem;color:rgba(255,255,255,.7);">{{ cap }} · {{ desc }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="grid-2" style="gap:64px;align-items:center;margin-bottom:60px;">
+      <div class="reveal-left">
+        <div class="section-tag"><i class="fas fa-gem"></i>&nbsp; Bespoke Experience</div>
+        <h2>Your Perfect Day, <span>Perfectly Crafted</span></h2>
+        <div class="section-line"></div>
+        <p style="color:var(--text2);margin-top:20px;line-height:1.9;">
+          E-Hotel offers bespoke wedding experiences designed to your exacting standards. From breathtaking flower arrangements in the Maharaja Ballroom to a grand multi-course banquet, our specialized wedding coordinators ensure every detail is flawless.
+        </p>
+        <ul class="feature-list" style="margin-top:24px;">
+          <li><i class="fas fa-heart"></i> Exclusive Bridal Suites &amp; Preparation Rooms</li>
+          <li><i class="fas fa-star"></i> Bespoke multi-cuisine catering by Executive Chefs</li>
+          <li><i class="fas fa-camera"></i> Picturesque locations for pre-wedding shoots</li>
+          <li><i class="fas fa-music"></i> Live orchestral &amp; DJ entertainment options</li>
+          <li><i class="fas fa-car"></i> Luxury vintage car pick-up for the wedding party</li>
+        </ul>
+      </div>
+      <div class="parallax-rotate reveal-right">
+        <img src="{{ url_for('static', filename='img/wedding_hall.png') }}" alt="Wedding"
+          style="width:100%;border-radius:var(--radius-lg);box-shadow:var(--shadow);">
+      </div>
+    </div>
+
+    <!-- BOOKING FORM -->
+    <div class="venue-booking-card reveal" id="wedding-enquiry">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start;" class="responsive-grid-2">
+        <div>
+          <div class="section-tag"><i class="fas fa-ring"></i>&nbsp; Start Planning</div>
+          <h2 style="font-family:'Cormorant Garamond',serif;font-size:2.2rem;margin-bottom:8px;">
+            Wedding <span>Enquiry</span>
+          </h2>
+          <div class="section-line" style="margin-bottom:20px;"></div>
+          <p style="color:var(--text2);line-height:1.8;margin-bottom:20px;">
+            Share your dream wedding vision and our dedicated wedding planners will craft a personalized proposal within 24 hours.
+          </p>
+          <div class="glass-card" style="padding:20px;">
+            <div style="font-size:.75rem;text-transform:uppercase;letter-spacing:2px;font-weight:700;color:var(--accent-dark);margin-bottom:12px;">Wedding Packages from</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:2.5rem;font-weight:700;color:var(--accent);">₹1,50,000</div>
+            <div style="font-size:.85rem;color:var(--text2);margin-top:4px;">Inclusive of venue, decor &amp; catering for 200 guests</div>
+          </div>
+        </div>
+        <div>
+          <form method="POST" action="{{ url_for('book_venue') }}" style="display:flex;flex-direction:column;gap:16px;">
+            <input type="hidden" name="venue_type" value="Wedding Venue">
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Your Name *</label>
+              <input type="text" name="name" class="form-control" required placeholder="Bride / Groom name"
+                value="{{ session.user_name if 'user_name' in session else '' }}">
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Email *</label>
+              <input type="email" name="email" class="form-control" required placeholder="you@email.com">
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Phone *</label>
+              <input type="tel" name="phone" class="form-control" required placeholder="+91 XXXXX XXXXX">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label">Wedding Date</label>
+                <input type="date" name="event_date" class="form-control" required>
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label">Expected Guests</label>
+                <input type="number" name="guests" class="form-control" min="10" placeholder="200">
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Preferred Venue</label>
+              <select name="venue_option" class="form-control">
+                <option value="To Be Decided">To Be Decided — Advise Me</option>
+                <option value="Maharaja Ballroom (600 guests)">Maharaja Ballroom (up to 600)</option>
+                <option value="Garden Pavilion (300 guests)">Garden Pavilion (up to 300)</option>
+                <option value="Royal Terrace (150 guests)">Royal Terrace (up to 150)</option>
+                <option value="Intimate Chapel (80 guests)">Intimate Chapel (up to 80)</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Your Vision / Special Requests</label>
+              <textarea name="message" class="form-control" rows="3" placeholder="Floral theme, cuisine preferences, entertainment ideas..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-magnetic" style="width:100%;justify-content:center;">
+              <i class="fas fa-heart"></i> Send Wedding Enquiry
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+@media (max-width:768px) {
+  .responsive-grid-2 { grid-template-columns:1fr !important; }
+  .h-scroll-item { flex: 0 0 85vw; }
+}
+</style>
+{% endblock %}

@@ -1,0 +1,115 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Venue Enquiries — Admin | E-Hotel{% endblock %}
+{% block page_title %}Venue &amp; Hall Enquiries{% endblock %}
+{% block content %}
+
+<div class="panel-header">
+  <h1>Venue &amp; Hall Enquiries</h1>
+  <p>Booking requests for meeting rooms, business lounge, wedding halls, dining reservations and other venues.</p>
+</div>
+
+<!-- Stats -->
+<div class="stats-grid" style="grid-template-columns:repeat(auto-fill,minmax(180px,1fr));margin-bottom:28px;">
+  <div class="stat-card">
+    <div class="stat-icon cyan"><i class="fas fa-calendar-alt"></i></div>
+    <div>
+      <div class="stat-value">{{ enquiries | length }}</div>
+      <div class="stat-label">Total Enquiries</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon orange"><i class="fas fa-hourglass-half"></i></div>
+    <div>
+      <div class="stat-value">{{ pending_count }}</div>
+      <div class="stat-label">Pending</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
+    <div>
+      <div class="stat-value">{{ enquiries | selectattr('status','eq','Confirmed') | list | length }}</div>
+      <div class="stat-label">Confirmed</div>
+    </div>
+  </div>
+</div>
+
+{% if enquiries %}
+<div class="table-wrapper">
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Guest Name</th>
+        <th>Email / Phone</th>
+        <th>Venue Type</th>
+        <th>Option Selected</th>
+        <th>Event Date</th>
+        <th>Guests</th>
+        <th>Notes</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for e in enquiries %}
+      <tr>
+        <td style="color:var(--text2);font-size:.8rem;">{{ e.id }}</td>
+        <td>
+          <strong>{{ e.name }}</strong>
+          {% if e.user_display_name %}<br><small style="color:var(--accent-dark);">Registered User</small>{% endif %}
+        </td>
+        <td>
+          <div>{{ e.email }}</div>
+          {% if e.phone %}<div style="font-size:.82rem;color:var(--text2);">{{ e.phone }}</div>{% endif %}
+        </td>
+        <td>
+          <span class="badge badge-info">{{ e.venue_type }}</span>
+        </td>
+        <td style="font-size:.85rem;max-width:180px;">{{ e.venue_option or '—' }}</td>
+        <td>
+          <strong style="color:var(--accent-dark);">{{ e.event_date }}</strong>
+        </td>
+        <td style="text-align:center;">{{ e.guests or '—' }}</td>
+        <td style="font-size:.82rem;max-width:160px;color:var(--text2);">
+          {{ (e.message or '')[:80] }}{% if e.message and e.message|length > 80 %}…{% endif %}
+        </td>
+        <td>
+          <span class="badge
+            {% if e.status == 'Confirmed' %}badge-success
+            {% elif e.status == 'Rejected' %}badge-danger
+            {% elif e.status == 'Completed' %}badge-secondary
+            {% else %}badge-warning{% endif %}">
+            {{ e.status }}
+          </span>
+        </td>
+        <td>
+          <form method="POST" action="{{ url_for('admin_update_venue_enquiry', enq_id=e.id) }}"
+                style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+            <select name="status" class="form-control" style="padding:5px 8px;font-size:.78rem;width:auto;">
+              <option value="Pending"   {% if e.status=='Pending'   %}selected{% endif %}>Pending</option>
+              <option value="Confirmed" {% if e.status=='Confirmed' %}selected{% endif %}>Confirmed</option>
+              <option value="Completed" {% if e.status=='Completed' %}selected{% endif %}>Completed</option>
+              <option value="Rejected"  {% if e.status=='Rejected'  %}selected{% endif %}>Rejected</option>
+            </select>
+            <button type="submit" class="btn btn-success btn-sm">Save</button>
+          </form>
+          <form method="POST" action="{{ url_for('admin_delete_venue_enquiry', enq_id=e.id) }}"
+                style="margin-top:6px;"
+                onsubmit="return confirm('Delete this enquiry?')">
+            <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="empty-state">
+  <i class="fas fa-calendar-times"></i>
+  <h3>No Venue Enquiries Yet</h3>
+  <p>Enquiries for halls, lounges, meeting rooms, weddings and dining reservations will appear here once guests submit them.</p>
+</div>
+{% endif %}
+
+{% endblock %}

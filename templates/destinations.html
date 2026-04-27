@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+{% block title %}Destinations — E-Hotel{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<div style="position:relative;height:58vh;overflow:hidden;display:flex;align-items:flex-end;">
+  <img src="{{ url_for('static', filename='img/dest1.png') }}" alt="Destinations"
+    style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(20,12,5,.9),rgba(0,0,0,.1));"></div>
+  <div class="container" style="position:relative;z-index:1;padding-bottom:60px;">
+    <div class="section-tag" style="color:var(--accent2);"><i class="fas fa-map-marker-alt"></i>&nbsp; Explore the World</div>
+    <h1 style="font-family:'Cormorant Garamond',serif;font-size:4rem;color:#fff;font-weight:700;line-height:1.1;">Our <span style="color:var(--accent2)">Destinations</span></h1>
+    <p style="color:rgba(255,255,255,.75);font-size:1.05rem;margin-top:10px;">From royal palaces to tropical shores — every stay is a unique adventure.</p>
+  </div>
+</div>
+
+<!-- Destinations Overview -->
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-tag"><i class="fas fa-compass"></i>&nbsp; Curated Collections</div>
+      <h2>Explore by <span>Location</span></h2>
+      <div class="section-line"></div>
+    </div>
+
+    <!-- ── JAIPUR ─────────────────────────────────── -->
+    <div style="margin-bottom:60px;" id="jaipur">
+      <div class="img-card anim-scale-in" style="height:420px;border-radius:var(--radius-lg);margin-bottom:24px;">
+        <img src="{{ url_for('static', filename='img/dest1.png') }}" alt="Jaipur" style="width:100%;height:100%;">
+        <div class="img-card-overlay" style="padding:44px 40px;">
+          <p style="font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--accent2);">Featured Destination</p>
+          <h2 style="font-size:2.6rem;margin-bottom:8px;">Jaipur — The Pink City</h2>
+          <p style="max-width:500px;line-height:1.7;opacity:.9;font-size:.95rem;">Immerse yourself in Rajasthan's royal splendour. Our heritage palace hotels blend centuries-old grandeur with modern luxury.</p>
+        </div>
+      </div>
+      <div class="grid-3">
+        {% for rtype, desc, icon in [
+          ('Heritage Single','Royal single room with traditional Rajasthani frescoes','fa-bed'),
+          ('Heritage Double','Spacious double room with hand-carved furniture','fa-users'),
+          ('Royal Suite','Opulent suite with marble bath, private terrace & butler','fa-crown')
+        ] %}
+        <div class="card anim-fade-up" style="text-align:center;padding:28px 20px;">
+          <div style="font-size:2rem;color:var(--accent);margin-bottom:14px;"><i class="fas {{ icon }}"></i></div>
+          <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.15rem;margin-bottom:8px;">{{ rtype }}</h3>
+          <p style="color:var(--text2);font-size:.82rem;line-height:1.6;margin-bottom:16px;">{{ desc }}</p>
+          <a href="{{ url_for('browse_rooms', destination='Jaipur', type=rtype) }}" class="btn btn-outline btn-sm">View Rooms</a>
+        </div>
+        {% endfor %}
+      </div>
+      <div style="text-align:center;margin-top:20px;">
+        <a href="{{ url_for('browse_rooms', destination='Jaipur') }}" class="btn btn-primary">
+          <i class="fas fa-hotel"></i> All Jaipur Rooms
+        </a>
+      </div>
+    </div>
+
+    <!-- ── GOA ──────────────────────────────────────── -->
+    <div style="margin-bottom:60px;" id="goa">
+      <div class="img-card anim-scale-in" style="height:420px;border-radius:var(--radius-lg);margin-bottom:24px;">
+        <img src="{{ url_for('static', filename='img/dest2.png') }}" alt="Goa" style="width:100%;height:100%;">
+        <div class="img-card-overlay" style="padding:44px 40px;">
+          <p style="font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--accent2);">Tropical Paradise</p>
+          <h2 style="font-size:2.6rem;margin-bottom:8px;">Goa — Sun, Sand &amp; Sea</h2>
+          <p style="max-width:500px;line-height:1.7;opacity:.9;font-size:.95rem;">Vibrant coastal culture, white sandy beaches, and world-class beach resorts that redefine relaxation.</p>
+        </div>
+      </div>
+      <div class="grid-3">
+        {% for rtype, desc, icon in [
+          ('Beach View Single','Bright room steps from the beach with sea breeze & tropical décor','fa-umbrella-beach'),
+          ('Pool-Side Double','Double room with direct pool access and sunset sundeck','fa-swimming-pool'),
+          ('Ocean Suite','Panoramic ocean-view suite with a private plunge pool','fa-water')
+        ] %}
+        <div class="card anim-fade-up" style="text-align:center;padding:28px 20px;">
+          <div style="font-size:2rem;color:var(--accent);margin-bottom:14px;"><i class="fas {{ icon }}"></i></div>
+          <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.15rem;margin-bottom:8px;">{{ rtype }}</h3>
+          <p style="color:var(--text2);font-size:.82rem;line-height:1.6;margin-bottom:16px;">{{ desc }}</p>
+          <a href="{{ url_for('browse_rooms', destination='Goa', type=rtype) }}" class="btn btn-outline btn-sm">View Rooms</a>
+        </div>
+        {% endfor %}
+      </div>
+      <div style="text-align:center;margin-top:20px;">
+        <a href="{{ url_for('browse_rooms', destination='Goa') }}" class="btn btn-primary">
+          <i class="fas fa-hotel"></i> All Goa Rooms
+        </a>
+      </div>
+    </div>
+
+    <!-- ── KERALA ─────────────────────────────────── -->
+    <div style="margin-bottom:60px;" id="kerala">
+      <div class="img-card anim-scale-in" style="height:420px;border-radius:var(--radius-lg);margin-bottom:24px;">
+        <img src="{{ url_for('static', filename='img/pool.png') }}" alt="Kerala" style="width:100%;height:100%;">
+        <div class="img-card-overlay" style="padding:44px 40px;">
+          <p style="font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--accent2);">God's Own Country</p>
+          <h2 style="font-size:2.6rem;margin-bottom:8px;">Kerala — Backwaters &amp; Bliss</h2>
+          <p style="max-width:500px;line-height:1.7;opacity:.9;font-size:.95rem;">Backwaters, tea estates, Ayurveda, and teak villas that float among the serene palm-lined canals.</p>
+        </div>
+      </div>
+      <div class="grid-2" style="max-width:700px;">
+        {% for rtype, desc, icon in [
+          ('Garden Single','Cosy room surrounded by lush coconut groves and Ayurvedic gardens','fa-leaf'),
+          ('Lake-View Suite','Teak suite with floor-to-ceiling lake views and private boat access','fa-ship')
+        ] %}
+        <div class="card anim-fade-up" style="text-align:center;padding:28px 20px;">
+          <div style="font-size:2rem;color:var(--accent);margin-bottom:14px;"><i class="fas {{ icon }}"></i></div>
+          <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.15rem;margin-bottom:8px;">{{ rtype }}</h3>
+          <p style="color:var(--text2);font-size:.82rem;line-height:1.6;margin-bottom:16px;">{{ desc }}</p>
+          <a href="{{ url_for('browse_rooms', destination='Kerala', type=rtype) }}" class="btn btn-outline btn-sm">View Rooms</a>
+        </div>
+        {% endfor %}
+      </div>
+      <div style="text-align:center;margin-top:20px;">
+        <a href="{{ url_for('browse_rooms', destination='Kerala') }}" class="btn btn-primary">
+          <i class="fas fa-hotel"></i> All Kerala Rooms
+        </a>
+      </div>
+    </div>
+
+    <!-- ── HIMALAYAS ─────────────────────────────── -->
+    <div style="margin-bottom:60px;" id="himalayas">
+      <div class="img-card anim-scale-in" style="height:420px;border-radius:var(--radius-lg);margin-bottom:24px;">
+        <img src="{{ url_for('static', filename='img/dest3.png') }}" alt="Himalayas" style="width:100%;height:100%;">
+        <div class="img-card-overlay" style="padding:44px 40px;">
+          <p style="font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--accent2);">Roof of the World</p>
+          <h2 style="font-size:2.6rem;margin-bottom:8px;">Himalayas — Peak &amp; Serenity</h2>
+          <p style="max-width:500px;line-height:1.7;opacity:.9;font-size:.95rem;">Majestic snow-capped peaks, alpine forests, and cosy mountain retreats with crackling fireplaces.</p>
+        </div>
+      </div>
+      <div class="grid-2" style="max-width:700px;">
+        {% for rtype, desc, icon in [
+          ('Mountain Single','Cosy room with panoramic Himalayan peak views and a fireplace','fa-mountain'),
+          ('Alpine Suite','Private log-cabin suite with mountain panoramas and hot tub','fa-hot-tub')
+        ] %}
+        <div class="card anim-fade-up" style="text-align:center;padding:28px 20px;">
+          <div style="font-size:2rem;color:var(--accent);margin-bottom:14px;"><i class="fas {{ icon }}"></i></div>
+          <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.15rem;margin-bottom:8px;">{{ rtype }}</h3>
+          <p style="color:var(--text2);font-size:.82rem;line-height:1.6;margin-bottom:16px;">{{ desc }}</p>
+          <a href="{{ url_for('browse_rooms', destination='Himalayas', type=rtype) }}" class="btn btn-outline btn-sm">View Rooms</a>
+        </div>
+        {% endfor %}
+      </div>
+      <div style="text-align:center;margin-top:20px;">
+        <a href="{{ url_for('browse_rooms', destination='Himalayas') }}" class="btn btn-primary">
+          <i class="fas fa-hotel"></i> All Himalaya Rooms
+        </a>
+      </div>
+    </div>
+
+    <!-- ── VARANASI + MUMBAI ─────────────────────── -->
+    <div class="grid-2" style="margin-bottom:40px;">
+      <!-- Varanasi -->
+      <div id="varanasi">
+        <div class="img-card" style="height:280px;border-radius:var(--radius-lg);margin-bottom:20px;">
+          <img src="{{ url_for('static', filename='img/lobby.png') }}" alt="Varanasi" style="width:100%;height:100%;">
+          <div class="img-card-overlay" style="padding:30px 28px;">
+            <p style="font-size:.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--accent2);">Spiritual Heritage</p>
+            <h3 style="font-size:1.8rem;margin-bottom:6px;">Varanasi</h3>
+            <p style="font-size:.85rem;opacity:.85;">Holy Ganga river, sacred Ghats, and timeless culture.</p>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="card" style="text-align:center;padding:20px 14px;">
+            <i class="fas fa-om" style="font-size:1.5rem;color:var(--accent);margin-bottom:10px;"></i>
+            <div style="font-weight:600;font-size:.9rem;margin-bottom:6px;">Ganga View Single</div>
+            <a href="{{ url_for('browse_rooms', destination='Varanasi') }}" class="btn btn-outline btn-sm">View</a>
+          </div>
+          <div class="card" style="text-align:center;padding:20px 14px;">
+            <i class="fas fa-landmark" style="font-size:1.5rem;color:var(--accent);margin-bottom:10px;"></i>
+            <div style="font-weight:600;font-size:.9rem;margin-bottom:6px;">Heritage Suite</div>
+            <a href="{{ url_for('browse_rooms', destination='Varanasi') }}" class="btn btn-outline btn-sm">View</a>
+          </div>
+        </div>
+        <div style="text-align:center;margin-top:14px;">
+          <a href="{{ url_for('browse_rooms', destination='Varanasi') }}" class="btn btn-primary btn-sm">All Varanasi Rooms</a>
+        </div>
+      </div>
+
+      <!-- Mumbai -->
+      <div id="mumbai">
+        <div class="img-card" style="height:280px;border-radius:var(--radius-lg);margin-bottom:20px;">
+          <img src="{{ url_for('static', filename='img/history.png') }}" alt="Mumbai" style="width:100%;height:100%;">
+          <div class="img-card-overlay" style="padding:30px 28px;">
+            <p style="font-size:.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--accent2);">City of Dreams</p>
+            <h3 style="font-size:1.8rem;margin-bottom:6px;">Mumbai</h3>
+            <p style="font-size:.85rem;opacity:.85;">Iconic skyline, historic landmarks, and electric energy.</p>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="card" style="text-align:center;padding:20px 14px;">
+            <i class="fas fa-city" style="font-size:1.5rem;color:var(--accent);margin-bottom:10px;"></i>
+            <div style="font-weight:600;font-size:.9rem;margin-bottom:6px;">City View Single</div>
+            <a href="{{ url_for('browse_rooms', destination='Mumbai') }}" class="btn btn-outline btn-sm">View</a>
+          </div>
+          <div class="card" style="text-align:center;padding:20px 14px;">
+            <i class="fas fa-building" style="font-size:1.5rem;color:var(--accent);margin-bottom:10px;"></i>
+            <div style="font-weight:600;font-size:.9rem;margin-bottom:6px;">Skyline Penthouse</div>
+            <a href="{{ url_for('browse_rooms', destination='Mumbai') }}" class="btn btn-outline btn-sm">View</a>
+          </div>
+        </div>
+        <div style="text-align:center;margin-top:14px;">
+          <a href="{{ url_for('browse_rooms', destination='Mumbai') }}" class="btn btn-primary btn-sm">All Mumbai Rooms</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Why travel with us -->
+<section class="section" style="background:var(--bg2);">
+  <div class="container">
+    <div class="section-header centered">
+      <h2>Why Travel <span>With Us</span></h2>
+      <div class="section-line centered"></div>
+    </div>
+    <div class="grid-4">
+      {% for icon, title, desc in [
+        ('fa-route','Curated Itineraries','Expert-designed journeys for discerning travelers'),
+        ('fa-gem','Luxury Properties','Hand-picked hotels with 5-star standards across India'),
+        ('fa-headset','Expert Support','24/7 travel assistance throughout your journey'),
+        ('fa-shield-alt','Safe & Secure','Trusted bookings with full data protection')
+      ] %}
+      <div class="card text-center anim-fade-up">
+        <div style="font-size:1.8rem;color:var(--accent);margin-bottom:16px;"><i class="fas {{ icon }}"></i></div>
+        <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.15rem;margin-bottom:10px;">{{ title }}</h3>
+        <p style="color:var(--text2);font-size:.82rem;line-height:1.7">{{ desc }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -5,16 +5,33 @@
 {% block content %}
 <div class="panel-header anim-fade-up">
   <h1>Booking <span class="text-accent">Management</span></h1>
-  <p>Approve, reject, and manage all customer bookings</p>
+  <p>Approve, reject, and manage all customer bookings across all hotel branches.</p>
+</div>
+
+<!-- Branch Filter -->
+<div class="card anim-fade-up-delay-1" style="padding:16px 20px;margin-bottom:0;">
+  <form method="get" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+    <label style="font-size:.82rem;font-weight:600;color:var(--text2);white-space:nowrap;"><i class="fas fa-filter" style="color:var(--accent);margin-right:6px;"></i> Filter by Branch:</label>
+    <select name="branch" class="form-control" style="width:auto;padding:8px 14px;font-size:.85rem;" onchange="this.form.submit()">
+      <option value="">All Branches</option>
+      {% for b in branches %}
+      <option value="{{ b }}" {{ 'selected' if selected_branch == b else '' }}>{{ b }}</option>
+      {% endfor %}
+    </select>
+    {% if selected_branch %}
+    <a href="{{ url_for('admin_bookings') }}" class="btn btn-outline btn-sm"><i class="fas fa-times"></i> Clear</a>
+    {% endif %}
+    <span style="font-size:.8rem;color:var(--text2);margin-left:auto;">{{ bookings|length }} bookings found</span>
+  </form>
 </div>
 
 {% if bookings %}
-<div class="card anim-fade-up-delay-1" style="padding:0">
+<div class="card anim-fade-up-delay-1" style="padding:0;margin-top:0;">
   <div class="table-wrapper">
     <table>
       <thead>
         <tr>
-          <th>#</th><th>Customer</th><th>Room</th><th>Type</th>
+          <th>#</th><th>Customer</th><th>Hotel / Branch</th><th>Room</th><th>Type</th>
           <th>Check-In</th><th>Check-Out</th><th>Total</th><th>Status</th><th>Actions</th>
         </tr>
       </thead>
@@ -25,6 +42,10 @@
           <td>
             <div style="font-weight:600">{{ b['cust_name'] }}</div>
             <div class="text-muted">{{ b['cust_email'] }}</div>
+          </td>
+          <td>
+            <div style="font-weight:600;font-size:.85rem;">{{ b['hotel_name'] or 'E-Hotel' }}</div>
+            <div class="text-muted" style="font-size:.75rem;">{{ b['branch'] or '—' }}</div>
           </td>
           <td><strong>{{ b['room_number'] }}</strong></td>
           <td><span class="badge badge-info">{{ b['room_type'] }}</span></td>
@@ -48,12 +69,12 @@
               </form>
               {% elif b['status'] == 'Confirmed' %}
               <form method="post" action="{{ url_for('admin_checkout', booking_id=b['id']) }}" style="display:inline">
-                <button class="btn btn-warning btn-sm" data-confirm="Mark this booking as checked out?">
+                <button class="btn btn-warning btn-sm" data-confirm="Mark as checked out? This will generate the final GST bill.">
                   <i class="fas fa-sign-out-alt"></i> Checkout
                 </button>
               </form>
               {% else %}
-              <span class="text-muted" style="font-size:.8rem">—</span>
+              <span class="text-muted" style="font-size:.8rem;">—</span>
               {% endif %}
             </div>
           </td>

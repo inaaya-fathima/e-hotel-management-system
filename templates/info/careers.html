@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Careers — E-Hotel{% endblock %}
+{% block content %}
+
+<div style="position:relative;height:45vh;overflow:hidden;display:flex;align-items:flex-end;background:#0a0800;">
+  <img src="{{ url_for('static', filename='img/lobby.png') }}" alt="Careers"
+    style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.5;">
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(10,6,0,.95),transparent);"></div>
+  <div class="container" style="position:relative;z-index:1;padding-bottom:60px;">
+    <div class="section-tag" style="color:var(--accent2);"><i class="fas fa-briefcase"></i>&nbsp; Join Our Family</div>
+    <h1 style="font-family:'Cormorant Garamond',serif;font-size:clamp(2.4rem,5vw,4rem);color:#fff;font-weight:700;">Careers at <span style="color:var(--accent2);">E-Hotel</span></h1>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+    <div class="section-header centered reveal">
+      <div class="section-tag" style="justify-content:center;"><i class="fas fa-star"></i>&nbsp; Why E-Hotel?</div>
+      <h2>Build a Career You're <span>Proud Of</span></h2>
+      <div class="section-line centered"></div>
+      <p>Join a team of 500+ passionate hospitality professionals dedicated to creating extraordinary experiences every day.</p>
+    </div>
+
+    <div class="grid-3" style="margin-bottom:64px;">
+      {% for icon, title, desc in [
+        ('fa-graduation-cap','World-Class Training','Access to our E-Hotel Academy with internationally accredited hospitality courses.'),
+        ('fa-chart-line','Growth Opportunities','90% of our senior leaders were promoted from within — your growth is our growth.'),
+        ('fa-hand-holding-heart','Wellbeing First','Comprehensive medical cover, mental health support, and annual wellness retreats.')
+      ] %}
+      <div class="card tilt-card reveal delay-{{ loop.index }}">
+        <i class="fas {{ icon }}" style="font-size:2rem;color:var(--accent);margin-bottom:14px;display:block;"></i>
+        <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;margin-bottom:10px;">{{ title }}</h3>
+        <p style="font-size:.85rem;color:var(--text2);line-height:1.7;">{{ desc }}</p>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="section-header centered reveal">
+      <h2>Open <span>Positions</span></h2>
+      <div class="section-line centered"></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px;margin-top:0;">
+      {% for role, dept, loc, type in [
+        ('Front Desk Executive','Concierge & Guest Relations','Jaipur / Goa / Mumbai','Full-Time'),
+        ('Executive Chef — International','Food & Beverage','Kerala / Himalayas','Full-Time'),
+        ('Spa Therapist (Ayurveda)','Wellness','Kerala Backwater Villas','Full-Time'),
+        ('Events Coordinator','Events & Weddings','Main Branch','Full-Time'),
+        ('Revenue Manager','Finance & Strategy','Mumbai HQ','Senior Role'),
+        ('Digital Marketing Executive','Corporate Office','Remote / Mumbai','Full-Time')
+      ] %}
+      <div class="card reveal" style="padding:22px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:180px;">
+          <h4 style="font-family:'Cormorant Garamond',serif;font-size:1.15rem;margin-bottom:4px;">{{ role }}</h4>
+          <div style="font-size:.8rem;color:var(--text2);">{{ dept }}</div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+          <span class="badge badge-secondary"><i class="fas fa-map-pin" style="margin-right:4px;"></i>{{ loc }}</span>
+          <span class="badge badge-info">{{ type }}</span>
+        </div>
+        <a href="{{ url_for('contact') }}" class="btn btn-outline btn-sm">Apply Now</a>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="venue-booking-card reveal" style="margin-top:48px;text-align:center;">
+      <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;margin-bottom:10px;">Don't see your role?</h3>
+      <p style="color:var(--text2);margin-bottom:24px;">Send us your CV and a brief introduction — we are always looking for talented people who share our passion.</p>
+      <a href="{{ url_for('contact') }}" class="btn btn-primary btn-magnetic"><i class="fas fa-paper-plane"></i> Send Open Application</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

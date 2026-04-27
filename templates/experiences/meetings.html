@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% block title %}Meetings & Conferences — Experiences | E-Hotel{% endblock %}
+{% block content %}
+
+<!-- ── HERO ──────────────────────────────────────────────── -->
+<div style="position:relative;height:60vh;overflow:hidden;display:flex;align-items:flex-end;">
+  <img src="{{ url_for('static', filename='img/meeting_room.png') }}" alt="Meetings"
+    style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(10,6,0,.95),rgba(0,0,0,.2));"></div>
+  <div class="container" style="position:relative;z-index:1;padding-bottom:70px;">
+    <div class="section-tag" style="color:var(--accent2);"><i class="fas fa-handshake"></i>&nbsp; Corporate Excellence</div>
+    <h1 style="font-family:'Cormorant Garamond',serif;font-size:clamp(2.4rem,5vw,4.5rem);color:#fff;font-weight:700;line-height:1.1;">
+      Meetings <span style="color:var(--accent2);">&amp; Conferences</span>
+    </h1>
+    <p style="color:rgba(255,255,255,.75);margin-top:12px;max-width:560px;font-size:1rem;line-height:1.7;">
+      State-of-the-art spaces engineered for ideas, decisions, and deals. Every detail is designed for flawless execution.
+    </p>
+  </div>
+</div>
+
+<!-- ── VENUE CARDS ────────────────────────────────────────── -->
+<section class="section" style="background:var(--bg2);">
+  <div class="container">
+    <div class="section-header centered">
+      <div class="section-tag" style="justify-content:center;"><i class="fas fa-building"></i>&nbsp; Our Spaces</div>
+      <h2>Professional Spaces, <span>Flawless Execution</span></h2>
+      <div class="section-line centered"></div>
+      <p>From intimate boardrooms to grand conference halls — E-Hotel has the perfect setting for every corporate event.</p>
+    </div>
+
+    <div class="grid-2" style="gap:32px;margin-bottom:48px;">
+      <div class="img-card img-reveal reveal-left" style="height:360px;">
+        <img src="{{ url_for('static', filename='img/meeting_room.png') }}" alt="Boardroom">
+        <div class="img-card-overlay">
+          <span class="badge badge-info" style="margin-bottom:8px;">Up to 25 Guests</span>
+          <h3 style="font-size:1.9rem;">Executive Boardroom</h3>
+          <p>85-inch 4K Smart Board | HD Video Conferencing | Leather Seating</p>
+          <div style="margin-top:10px;color:var(--accent2);font-weight:700;font-size:1.1rem;">From ₹15,000 / session</div>
+        </div>
+      </div>
+      <div class="img-card img-reveal reveal-right" style="height:360px;">
+        <img src="{{ url_for('static', filename='img/lobby.png') }}" alt="Conference Hall">
+        <div class="img-card-overlay">
+          <span class="badge badge-info" style="margin-bottom:8px;">Up to 200 Guests</span>
+          <h3 style="font-size:1.9rem;">Grand Conference Hall</h3>
+          <p>Stage &amp; Podium | Superior Acoustics | Modular Seating Arrangements</p>
+          <div style="margin-top:10px;color:var(--accent2);font-weight:700;font-size:1.1rem;">From ₹45,000 / day</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Features strip -->
+    <div class="grid-4" style="gap:20px;margin-bottom:60px;">
+      {% for icon, label in [('fa-wifi','1Gbps Fibre Wi-Fi'),('fa-video','4K Video Conf'),('fa-utensils','Catering On-Site'),('fa-car','Valet Parking')] %}
+      <div class="card text-center tilt-card reveal delay-{{ loop.index }}" style="padding:20px;">
+        <i class="fas {{ icon }}" style="font-size:1.8rem;color:var(--accent);margin-bottom:10px;display:block;"></i>
+        <div style="font-size:.85rem;font-weight:600;">{{ label }}</div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- ── BOOKING FORM ─────────────────────────────────── -->
+    <div class="venue-booking-card reveal" id="book-venue">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;" class="responsive-grid-2">
+        <div>
+          <div class="section-tag"><i class="fas fa-calendar-check"></i>&nbsp; Reserve Your Space</div>
+          <h2 style="font-family:'Cormorant Garamond',serif;font-size:2.2rem;margin-bottom:8px;">
+            Book a <span>Meeting Room</span>
+          </h2>
+          <div class="section-line" style="margin-bottom:20px;"></div>
+          <p style="color:var(--text2);line-height:1.8;">
+            Fill in your details and our corporate events team will confirm your booking within 2 hours. 
+            All bookings are saved and reviewed by our venue management team.
+          </p>
+          <ul class="feature-list" style="margin-top:20px;">
+            <li><i class="fas fa-check-circle"></i> No hidden charges — transparent pricing</li>
+            <li><i class="fas fa-check-circle"></i> Dedicated event coordinator assigned</li>
+            <li><i class="fas fa-check-circle"></i> Complimentary welcome refreshments</li>
+            <li><i class="fas fa-check-circle"></i> Instant confirmation email</li>
+          </ul>
+        </div>
+        <div>
+          {% with messages = get_flashed_messages(with_categories=true) %}
+          {% for cat, msg in messages %}
+          <div class="alert alert-{{ cat }}" style="margin-bottom:16px;">
+            <i class="fas fa-info-circle"></i> {{ msg }}
+          </div>
+          {% endfor %}
+          {% endwith %}
+          <form method="POST" action="{{ url_for('book_venue') }}" style="display:flex;flex-direction:column;gap:16px;">
+            <input type="hidden" name="venue_type" value="Meeting Room / Conference">
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Full Name *</label>
+              <input type="text" name="name" class="form-control" required placeholder="Your full name"
+                value="{{ session.user_name if 'user_name' in session else '' }}">
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Email Address *</label>
+              <input type="email" name="email" class="form-control" required placeholder="you@company.com">
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Phone Number</label>
+              <input type="tel" name="phone" class="form-control" placeholder="+91 XXXXX XXXXX">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label">Event Date *</label>
+                <input type="date" name="event_date" class="form-control" required>
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label">No. of Attendees</label>
+                <input type="number" name="guests" class="form-control" min="1" max="200" placeholder="50">
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Venue Type *</label>
+              <select name="venue_option" class="form-control" required>
+                <option value="">-- Select Venue --</option>
+                <option value="Executive Boardroom (up to 25)">Executive Boardroom (up to 25 guests)</option>
+                <option value="Grand Conference Hall (up to 200)">Grand Conference Hall (up to 200 guests)</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Special Requirements</label>
+              <textarea name="message" class="form-control" rows="3" placeholder="AV setup, catering preferences, special arrangements..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-magnetic" style="width:100%;justify-content:center;font-size:.9rem;">
+              <i class="fas fa-calendar-check"></i> Submit Booking Request
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+@media (max-width:768px) {
+  .responsive-grid-2 { grid-template-columns:1fr !important; }
+}
+</style>
+{% endblock %}

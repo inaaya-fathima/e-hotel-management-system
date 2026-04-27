@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block title %}Offers & Packages — E-Hotel{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<div style="position:relative;height:50vh;overflow:hidden;display:flex;align-items:flex-end;">
+  <img src="{{ url_for('static', filename='img/dest2.png') }}" alt="Offers"
+    style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(26,18,9,.9),rgba(0,0,0,.1));"></div>
+  <div class="container" style="position:relative;z-index:1;padding-bottom:60px;">
+    <div class="section-tag" style="color:var(--accent2);"><i class="fas fa-tags"></i>&nbsp; Exclusive Deals</div>
+    <h1 style="font-family:'Cormorant Garamond',serif;font-size:clamp(2.5rem,7vw,4rem);color:#fff;font-weight:700;">
+      Special <span style="color:var(--accent2)">Offers</span>
+    </h1>
+  </div>
+</div>
+
+<!-- Direct Booking Banner -->
+<div style="background:var(--accent);padding:22px 0;">
+  <div class="container" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;">
+    <div>
+      <div style="font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.7);margin-bottom:4px;">Exclusive Benefit</div>
+      <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;color:#fff;">Book Direct — Save More</h3>
+    </div>
+    <p style="color:rgba(255,255,255,.8);font-size:.9rem;max-width:340px;">Best rate guarantee, complimentary breakfast, and priority early check-in when you book directly.</p>
+    <a href="{{ url_for('destinations') }}" class="btn" style="background:#fff;color:var(--accent-dark);flex-shrink:0;">Reserve Now <i class="fas fa-arrow-right"></i></a>
+  </div>
+</div>
+
+<!-- Full Offers Section -->
+<section class="section">
+  <div class="container">
+    <div class="section-header centered">
+      <div class="section-tag" style="justify-content:center;"><i class="fas fa-percentage"></i>&nbsp; Curated Packages</div>
+      <h2>Our <span>Offers</span></h2>
+      <div class="section-line centered"></div>
+      <p style="max-width:600px;margin:12px auto 0;">Each package is thoughtfully curated to give you maximum value and unforgettable experiences. Book directly below.</p>
+    </div>
+
+    {% for offer in offers %}
+    <div class="card anim-fade-up" id="offer-{{ offer['id'] }}" style="margin-bottom:36px;overflow:hidden;padding:0;">
+      <div style="display:grid;grid-template-columns:1fr 1.4fr;gap:0;" class="offer-card-inner">
+        <!-- Image -->
+        <div style="position:relative;overflow:hidden;min-height:300px;">
+          <img src="{{ offer['image_url'] }}" alt="{{ offer['title'] }}"
+               style="width:100%;height:100%;object-fit:cover;transition:transform .6s;">
+          {% if offer['discount_pct'] and offer['discount_pct'] > 0 %}
+          <div style="position:absolute;top:20px;left:20px;background:var(--danger);color:#fff;font-size:.65rem;letter-spacing:2px;text-transform:uppercase;padding:5px 14px;border-radius:20px;font-weight:700;">
+            {{ offer['discount_pct'] }}% OFF
+          </div>
+          {% endif %}
+          <div style="position:absolute;bottom:20px;left:20px;">
+            <span class="badge badge-info">{{ offer['type'] }}</span>
+          </div>
+        </div>
+
+        <!-- Details -->
+        <div style="padding:36px;">
+          <h2 style="font-family:'Cormorant Garamond',serif;font-size:2rem;margin-bottom:12px;">{{ offer['title'] }}</h2>
+          <p style="color:var(--text2);line-height:1.8;margin-bottom:20px;">{{ offer['description'] }}</p>
+
+          <!-- Features -->
+          {% if offer['features'] %}
+          <div style="margin-bottom:24px;">
+            <div style="font-size:.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--text2);font-weight:700;margin-bottom:12px;">What's Included</div>
+            <ul style="list-style:none;display:flex;flex-direction:column;gap:8px;">
+              {% for feat in offer['features'].split('|') %}
+              <li style="display:flex;align-items:center;gap:10px;font-size:.87rem;color:var(--text);">
+                <i class="fas fa-check-circle" style="color:var(--success);flex-shrink:0;"></i>
+                {{ feat }}
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+          {% endif %}
+
+          <!-- Price + CTA -->
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;border-top:1px solid var(--border);padding-top:20px;">
+            <div>
+              {% if offer['price'] and offer['price'] > 0 %}
+              <div style="font-size:.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--text2);">Starting From</div>
+              <div style="font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700;color:var(--accent);">
+                ₹{{ "%.0f"|format(offer['price']) }}
+                {% if offer['discount_pct'] and offer['discount_pct'] > 0 %}
+                <span style="font-size:.9rem;color:var(--text2);text-decoration:line-through;font-weight:400;">
+                  ₹{{ "%.0f"|format(offer['price'] / (1 - offer['discount_pct']/100)) }}
+                </span>
+                {% endif %}
+              </div>
+              {% if offer['valid_until'] %}
+              <div style="font-size:.75rem;color:var(--warning);"><i class="fas fa-clock"></i> Valid until {{ offer['valid_until'] }}</div>
+              {% endif %}
+              {% endif %}
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              {% if 'user_id' in session %}
+              <a href="{{ url_for('destinations') }}" class="btn btn-primary">
+                <i class="fas fa-calendar-plus"></i> Book This Package
+              </a>
+              {% else %}
+              <a href="{{ url_for('customer_login') }}" class="btn btn-primary">
+                <i class="fas fa-sign-in-alt"></i> Login to Book
+              </a>
+              {% endif %}
+              <a href="{{ url_for('contact') }}" class="btn btn-outline">
+                <i class="fas fa-envelope"></i> Enquire
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="empty-state"><i class="fas fa-tags"></i><p>No offers available right now.</p></div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+@media (max-width: 768px) {
+  .offer-card-inner { grid-template-columns: 1fr !important; }
+  .offer-card-inner > div:first-child { min-height:220px !important; }
+}
+</style>
+{% endblock %}

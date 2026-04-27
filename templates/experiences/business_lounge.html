@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% block title %}Business Lounge — Experiences | E-Hotel{% endblock %}
+{% block content %}
+
+<!-- ── HERO ──────────────────────────────────────────────── -->
+<div style="position:relative;height:60vh;overflow:hidden;display:flex;align-items:flex-end;">
+  <img src="{{ url_for('static', filename='img/business_lounge.png') }}" alt="Business Lounge"
+    style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(10,6,0,.95),rgba(0,0,0,.15));"></div>
+  <div class="container" style="position:relative;z-index:1;padding-bottom:70px;">
+    <div class="section-tag" style="color:var(--accent2);"><i class="fas fa-briefcase"></i>&nbsp; Work in Luxury</div>
+    <h1 style="font-family:'Cormorant Garamond',serif;font-size:clamp(2.4rem,5vw,4.5rem);color:#fff;font-weight:700;line-height:1.1;">
+      Business <span style="color:var(--accent2);">Lounge</span>
+    </h1>
+    <p style="color:rgba(255,255,255,.75);margin-top:12px;max-width:560px;font-size:1rem;line-height:1.7;">
+      Where productivity meets unparalleled comfort. The definitive workspace for the modern executive.
+    </p>
+  </div>
+</div>
+
+<!-- ── CONTENT ───────────────────────────────────────────── -->
+<section class="section">
+  <div class="container">
+    <div class="grid-2" style="gap:64px;align-items:center;margin-bottom:70px;">
+      <div class="reveal-left">
+        <div class="section-tag"><i class="fas fa-crown"></i>&nbsp; Premium Workspace</div>
+        <h2>Unmatched Comfort for <span>Professionals</span></h2>
+        <div class="section-line"></div>
+        <p style="color:var(--text2);margin-top:20px;line-height:1.9;">
+          Our luxury business lounge is designed for the modern executive — high-speed fibre internet, private phone booths, unlimited premium brewed coffee, and spectacular city views.
+        </p>
+        <ul class="feature-list" style="margin-top:24px;">
+          <li><i class="fas fa-wifi"></i> 1Gbps Dedicated Fiber Wi-Fi</li>
+          <li><i class="fas fa-print"></i> Secure Printing &amp; Scanning Station</li>
+          <li><i class="fas fa-coffee"></i> Complimentary Artisanal Refreshments</li>
+          <li><i class="fas fa-phone-alt"></i> Private Sound-Proof Phone Booths</li>
+          <li><i class="fas fa-lock"></i> Secure Document Handling</li>
+          <li><i class="fas fa-user-tie"></i> Dedicated Business Concierge</li>
+        </ul>
+        <div style="margin-top:28px;display:flex;gap:12px;flex-wrap:wrap;">
+          <div class="glass-card" style="padding:16px 24px;text-align:center;flex:1;min-width:120px;">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700;color:var(--accent);">30</div>
+            <div style="font-size:.75rem;color:var(--text2);letter-spacing:1px;text-transform:uppercase;">Workstations</div>
+          </div>
+          <div class="glass-card" style="padding:16px 24px;text-align:center;flex:1;min-width:120px;">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700;color:var(--accent);">24/7</div>
+            <div style="font-size:.75rem;color:var(--text2);letter-spacing:1px;text-transform:uppercase;">Open Hours</div>
+          </div>
+          <div class="glass-card" style="padding:16px 24px;text-align:center;flex:1;min-width:120px;">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700;color:var(--accent);">1Gbps</div>
+            <div style="font-size:.75rem;color:var(--text2);letter-spacing:1px;text-transform:uppercase;">Fibre Speed</div>
+          </div>
+        </div>
+      </div>
+      <div class="parallax-rotate reveal-right">
+        <img src="{{ url_for('static', filename='img/business_lounge.png') }}" alt="Business Lounge"
+          style="width:100%;border-radius:var(--radius-lg);box-shadow:var(--shadow);">
+      </div>
+    </div>
+
+    <!-- ── BOOKING FORM ─────────────────────────────────── -->
+    <div class="venue-booking-card reveal" id="book-lounge">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;" class="responsive-grid-2">
+        <div>
+          <div class="section-tag"><i class="fas fa-calendar-check"></i>&nbsp; Reserve Your Spot</div>
+          <h2 style="font-family:'Cormorant Garamond',serif;font-size:2.2rem;margin-bottom:8px;">
+            Book the <span>Business Lounge</span>
+          </h2>
+          <div class="section-line" style="margin-bottom:20px;"></div>
+          <p style="color:var(--text2);line-height:1.8;">
+            Reserve a dedicated workstation or private booth for a half-day or full day.
+            Our team will confirm within 1 hour.
+          </p>
+          <div style="margin-top:24px;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.3);border-radius:var(--radius);padding:16px;">
+            <div style="font-size:.8rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--accent-dark);margin-bottom:8px;">Pricing</div>
+            <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:.88rem;">
+              <div><strong>Half Day (4hrs)</strong> — ₹1,500</div>
+              <div><strong>Full Day (8hrs)</strong> — ₹3,000</div>
+              <div><strong>Monthly Pass</strong> — ₹18,000</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <form method="POST" action="{{ url_for('book_venue') }}" style="display:flex;flex-direction:column;gap:16px;">
+            <input type="hidden" name="venue_type" value="Business Lounge">
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Full Name *</label>
+              <input type="text" name="name" class="form-control" required placeholder="Your name"
+                value="{{ session.user_name if 'user_name' in session else '' }}">
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Email Address *</label>
+              <input type="email" name="email" class="form-control" required placeholder="you@company.com">
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Phone Number</label>
+              <input type="tel" name="phone" class="form-control" placeholder="+91 XXXXX XXXXX">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label">Date *</label>
+                <input type="date" name="event_date" class="form-control" required>
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label">Duration *</label>
+                <select name="venue_option" class="form-control" required>
+                  <option value="">-- Select --</option>
+                  <option value="Half Day (4hrs) — ₹1500">Half Day (4hrs)</option>
+                  <option value="Full Day (8hrs) — ₹3000">Full Day (8hrs)</option>
+                  <option value="Monthly Pass — ₹18000">Monthly Pass</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">No. of Guests</label>
+              <input type="number" name="guests" class="form-control" min="1" max="30" placeholder="1" value="1">
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Additional Notes</label>
+              <textarea name="message" class="form-control" rows="2" placeholder="Any special requirements..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-magnetic" style="width:100%;justify-content:center;">
+              <i class="fas fa-calendar-check"></i> Reserve Business Lounge
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+@media (max-width:768px) {
+  .responsive-grid-2 { grid-template-columns:1fr !important; }
+}
+</style>
+{% endblock %}

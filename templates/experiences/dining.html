@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+{% block title %}Fine Dining — Experiences | E-Hotel{% endblock %}
+{% block content %}
+
+<!-- ── HERO ──────────────────────────────────────────────── -->
+<div style="position:relative;height:65vh;overflow:hidden;display:flex;align-items:flex-end;">
+  <img src="{{ url_for('static', filename='img/rooftop.png') }}" alt="Fine Dining"
+    style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(10,6,0,.95),rgba(0,0,0,.2));"></div>
+  <div class="container" style="position:relative;z-index:1;padding-bottom:70px;">
+    <div class="section-tag" style="color:var(--accent2);"><i class="fas fa-utensils"></i>&nbsp; Culinary Excellence</div>
+    <h1 style="font-family:'Cormorant Garamond',serif;font-size:clamp(2.8rem,6vw,5rem);color:#fff;font-weight:700;line-height:1.05;">
+      Fine <span style="color:var(--accent2);">Dining</span>
+    </h1>
+    <p style="color:rgba(255,255,255,.75);margin-top:12px;max-width:600px;font-size:1.05rem;line-height:1.7;">
+      A symphony of flavours crafted by Michelin-inspired chefs, offering a globally curated menu in the most luxurious settings.
+    </p>
+  </div>
+</div>
+
+<!-- ── HORIZONTAL MENU SCROLL ────────────────────────────── -->
+<section style="background:var(--bg2);padding:60px 0 40px;">
+  <div class="container">
+    <div class="section-header centered">
+      <div class="section-tag" style="justify-content:center;"><i class="fas fa-concierge-bell"></i>&nbsp; Our Restaurants</div>
+      <h2>Dining <span>Experiences</span></h2>
+      <div class="section-line centered"></div>
+    </div>
+    <div class="h-scroll-track" style="padding-bottom:16px;">
+      {% for icon, name, tag, desc in [
+        ('fa-moon','The Celestial Rooftop','Skyline Dining','360° panoramic views, candlelit tables, sunset cocktails'),
+        ('fa-leaf','The Garden Brasserie','All-Day Dining','Farm-to-table menus in a lush greenhouse setting'),
+        ('fa-glass-martini-alt','The Amber Lounge','Cocktail & Tapas','Artisan cocktails and gourmet small plates'),
+        ('fa-fish','Oceanica','Seafood Specialty','Daily fresh catch, sushi bar, and live lobster tank')
+      ] %}
+      <div class="h-scroll-item glass-card" style="height:auto;padding:28px;flex:0 0 280px;display:flex;flex-direction:column;gap:12px;">
+        <div style="width:52px;height:52px;border-radius:50%;background:rgba(201,168,76,.12);border:1px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:1.3rem;color:var(--accent);">
+          <i class="fas {{ icon }}"></i>
+        </div>
+        <div style="font-size:.68rem;letter-spacing:2px;text-transform:uppercase;color:var(--accent-dark);font-weight:700;">{{ tag }}</div>
+        <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:700;">{{ name }}</h3>
+        <p style="font-size:.85rem;color:var(--text2);line-height:1.7;">{{ desc }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ── MAIN CONTENT ───────────────────────────────────────── -->
+<section class="section">
+  <div class="container">
+    <div class="grid-2" style="gap:64px;align-items:center;margin-bottom:64px;">
+      <div class="reveal-left">
+        <div class="section-tag" id="rooftop"><i class="fas fa-moon"></i>&nbsp; Signature Restaurant</div>
+        <h2>The Celestial <span>Rooftop</span></h2>
+        <div class="section-line"></div>
+        <p style="color:var(--text2);margin-top:20px;line-height:1.9;">
+          Perched at the highest peak of E-Hotel, our signature rooftop restaurant offers breathtaking 360-degree panoramic views of the city skyline. Enjoy an intimate, candlelit dinner featuring an exquisite fusion of local delicacies and international gourmet dishes, expertly paired with wines from our award-winning cellar.
+        </p>
+        <ul class="feature-list" style="margin-top:24px;">
+          <li><i class="fas fa-sun"></i> Pre-dinner sunset cocktails on the sky terrace</li>
+          <li><i class="fas fa-music"></i> Live romantic acoustic performances nightly</li>
+          <li><i class="fas fa-wine-glass-alt"></i> Extensive global wine cellar — 200+ labels</li>
+          <li><i class="fas fa-birthday-cake"></i> Private chef's table experience on request</li>
+        </ul>
+        <div style="display:flex;gap:12px;margin-top:28px;flex-wrap:wrap;">
+          <a href="{{ url_for('browse_rooms') }}" class="btn btn-primary btn-magnetic">
+            <i class="fas fa-calendar"></i> Reserve Stay &amp; Table
+          </a>
+          <a href="{{ url_for('contact') }}" class="btn btn-outline">
+            <i class="fas fa-phone"></i> Make Enquiry
+          </a>
+        </div>
+      </div>
+      <div class="parallax-rotate reveal-right">
+        <img src="{{ url_for('static', filename='img/rooftop.png') }}" alt="Rooftop Restaurant"
+          style="width:100%;border-radius:var(--radius-lg);box-shadow:var(--shadow);">
+      </div>
+    </div>
+
+    <!-- Cuisine highlights -->
+    <div class="section-header centered reveal">
+      <div class="section-tag" style="justify-content:center;"><i class="fas fa-star"></i>&nbsp; Our Cuisine</div>
+      <h2>A World of <span>Flavours</span></h2>
+      <div class="section-line centered"></div>
+    </div>
+    <div class="grid-4" style="gap:20px;margin-top:36px;">
+      {% for name, flag, desc in [
+        ('Indian','🇮🇳','Royal Mughlai, coastal Goan, and Awadhi dum cooking'),
+        ('Italian','🇮🇹','House-made pastas, wood-fired pizzas, and gelato'),
+        ('Japanese','🇯🇵','Omakase sushi, ramen, and teppanyaki theatre'),
+        ('Mediterranean','🌊','Mezze platters, grilled seafood, and fresh hummus')
+      ] %}
+      <div class="card text-center tilt-card reveal delay-{{ loop.index }}">
+        <div style="font-size:2rem;margin-bottom:12px;">{{ flag }}</div>
+        <h4 style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;margin-bottom:8px;">{{ name }}</h4>
+        <p style="font-size:.82rem;color:var(--text2);line-height:1.7;">{{ desc }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ── DINING RESERVATION FORM ────────────────────────────── -->
+<section class="section" style="background:var(--bg2);">
+  <div class="container">
+    <div class="venue-booking-card reveal">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;" class="responsive-grid-2">
+        <div>
+          <div class="section-tag"><i class="fas fa-utensils"></i>&nbsp; Table Reservation</div>
+          <h2 style="font-family:'Cormorant Garamond',serif;font-size:2.2rem;margin-bottom:8px;">
+            Reserve Your <span>Table</span>
+          </h2>
+          <div class="section-line" style="margin-bottom:20px;"></div>
+          <p style="color:var(--text2);line-height:1.8;">
+            Secure your spot at one of our celebrated restaurants. We'll confirm your reservation within the hour and send personalized recommendations.
+          </p>
+          <div style="margin-top:24px;display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;gap:10px;align-items:center;font-size:.88rem;">
+              <i class="fas fa-clock" style="color:var(--accent);width:18px;"></i>
+              <span><strong>Lunch:</strong> 12:30 PM – 3:00 PM</span>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center;font-size:.88rem;">
+              <i class="fas fa-moon" style="color:var(--accent);width:18px;"></i>
+              <span><strong>Dinner:</strong> 7:00 PM – 11:00 PM</span>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center;font-size:.88rem;">
+              <i class="fas fa-coffee" style="color:var(--accent);width:18px;"></i>
+              <span><strong>Breakfast:</strong> 7:00 AM – 10:30 AM (hotel guests)</span>
+            </div>
+          </div>
+        </div>
+        <div>
+          <form method="POST" action="{{ url_for('book_venue') }}" style="display:flex;flex-direction:column;gap:16px;">
+            <input type="hidden" name="venue_type" value="Fine Dining Reservation">
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Name *</label>
+              <input type="text" name="name" class="form-control" required placeholder="Your name"
+                value="{{ session.user_name if 'user_name' in session else '' }}">
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Email *</label>
+              <input type="email" name="email" class="form-control" required placeholder="you@email.com">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label">Date *</label>
+                <input type="date" name="event_date" class="form-control" required>
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label">Guests</label>
+                <input type="number" name="guests" class="form-control" min="1" max="20" placeholder="2" value="2">
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Restaurant &amp; Meal</label>
+              <select name="venue_option" class="form-control">
+                <option value="The Celestial Rooftop — Dinner">The Celestial Rooftop — Dinner</option>
+                <option value="The Celestial Rooftop — Lunch">The Celestial Rooftop — Lunch</option>
+                <option value="The Garden Brasserie — Any">The Garden Brasserie</option>
+                <option value="The Amber Lounge — Evening">The Amber Lounge — Evening</option>
+                <option value="Oceanica — Lunch">Oceanica — Lunch / Dinner</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Dietary / Special Requests</label>
+              <textarea name="message" class="form-control" rows="2" placeholder="Allergies, anniversary setup, vegetarian, etc."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-magnetic" style="width:100%;justify-content:center;">
+              <i class="fas fa-concierge-bell"></i> Reserve My Table
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+@media (max-width:768px) {
+  .responsive-grid-2 { grid-template-columns:1fr !important; }
+  .h-scroll-item { flex: 0 0 85vw !important; }
+}
+</style>
+{% endblock %}

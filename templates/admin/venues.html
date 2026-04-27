@@ -1,0 +1,68 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Venues & Halls — Admin{% endblock %}
+{% block page_title %}Venues & Halls Management{% endblock %}
+
+{% block content %}
+<div class="action-bar anim-fade-up">
+  <div class="panel-header" style="margin:0">
+    <h1>Venues <span class="text-accent">&amp; Halls</span></h1>
+    <p>Manage party halls, conference rooms, pools, and special packages</p>
+  </div>
+  <a href="{{ url_for('admin_add_room') }}?category=Hall" class="btn btn-primary">
+    <i class="fas fa-plus"></i> Add Venue
+  </a>
+</div>
+
+<!-- Category Tabs -->
+<div style="display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap;" class="anim-fade-up-delay-1">
+  {% for cat, icon in [('All','fas fa-th'),('Hall','fas fa-glass-cheers'),('Pool','fas fa-swimming-pool'),('Package','fas fa-box-open')] %}
+  <a href="{{ url_for('admin_venues') }}{{ '?cat='+cat if cat != 'All' else '' }}"
+     class="btn {{ 'btn-primary' if (request.args.get('cat','All')==cat) else 'btn-outline' }} btn-sm">
+    <i class="{{ icon }}"></i> {{ cat }}
+  </a>
+  {% endfor %}
+</div>
+
+{% if venues %}
+<div class="grid-3 anim-fade-up-delay-1" style="gap:20px;">
+  {% for v in venues %}
+  {% if request.args.get('cat','All') == 'All' or v['category'] == request.args.get('cat') %}
+  <div class="card" style="padding:0;overflow:hidden;">
+    <div style="height:180px;overflow:hidden;position:relative;">
+      <img src="{{ v['image_url'] or 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=600' }}"
+           alt="{{ v['room_type'] }}" style="width:100%;height:100%;object-fit:cover;">
+      <div style="position:absolute;top:12px;left:12px;">
+        <span class="badge {{ 'badge-success' if v['status']=='Available' else 'badge-danger' }}">{{ v['status'] }}</span>
+      </div>
+      <div style="position:absolute;top:12px;right:12px;">
+        <span class="badge badge-info">{{ v['category'] }}</span>
+      </div>
+    </div>
+    <div style="padding:18px;">
+      <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;margin-bottom:6px;">{{ v['room_type'] }}</h3>
+      <div style="color:var(--text2);font-size:.78rem;margin-bottom:4px;">
+        <i class="fas fa-hashtag"></i> {{ v['room_number'] }}
+        &nbsp;|&nbsp;
+        <i class="fas fa-users"></i> Capacity: {{ v['capacity'] }}
+      </div>
+      <div style="color:var(--accent);font-weight:700;font-size:1.1rem;margin:10px 0;">
+        ₹{{ "%.0f"|format(v['price']) }}<span style="font-size:.72rem;color:var(--text2);font-weight:400;"> / booking</span>
+      </div>
+      <p style="color:var(--text2);font-size:.8rem;line-height:1.6;margin-bottom:14px;">{{ v['description'][:80] }}...</p>
+      <div style="display:flex;gap:8px;">
+        <a href="{{ url_for('admin_edit_room', room_id=v['id']) }}" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i> Edit</a>
+        <form method="post" action="{{ url_for('admin_delete_room', room_id=v['id']) }}" style="display:inline">
+          <button class="btn btn-danger btn-sm" data-confirm="Delete {{ v['room_type'] }}?">
+            <i class="fas fa-trash"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+  {% endfor %}
+</div>
+{% else %}
+<div class="card"><div class="empty-state"><i class="fas fa-building"></i><p>No venues found.</p></div></div>
+{% endif %}
+{% endblock %}

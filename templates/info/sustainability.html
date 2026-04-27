@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Sustainability — E-Hotel{% endblock %}
+{% block content %}
+
+<div style="position:relative;height:45vh;overflow:hidden;display:flex;align-items:flex-end;background:#0a0800;">
+  <img src="{{ url_for('static', filename='img/dest3.png') }}" alt="Sustainability"
+    style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.6;">
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(10,6,0,.95),transparent);"></div>
+  <div class="container" style="position:relative;z-index:1;padding-bottom:60px;">
+    <div class="section-tag" style="color:var(--accent2);"><i class="fas fa-leaf"></i>&nbsp; Responsible Luxury</div>
+    <h1 style="font-family:'Cormorant Garamond',serif;font-size:clamp(2.4rem,5vw,4rem);color:#fff;font-weight:700;">Our <span style="color:var(--accent2);">Sustainability</span> Promise</h1>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+    <div class="grid-2" style="gap:64px;align-items:center;margin-bottom:64px;">
+      <div class="reveal-left">
+        <div class="section-tag"><i class="fas fa-seedling"></i>&nbsp; Our Commitment</div>
+        <h2>Luxury That <span>Loves the Planet</span></h2>
+        <div class="section-line"></div>
+        <p style="color:var(--text2);margin-top:20px;line-height:1.9;">
+          At E-Hotel, we believe the finest luxury must leave the world better than it found it. Our Green Excellence programme, launched in 2019, commits every property to measurable environmental targets that we report on annually.
+        </p>
+        <ul class="feature-list" style="margin-top:24px;">
+          <li><i class="fas fa-solar-panel"></i> 70% renewable energy across all properties by 2025</li>
+          <li><i class="fas fa-recycle"></i> Zero single-use plastics since 2021</li>
+          <li><i class="fas fa-water"></i> Rainwater harvesting at all properties</li>
+          <li><i class="fas fa-tree"></i> 10,000 trees planted annually in partnership with local communities</li>
+          <li><i class="fas fa-utensils"></i> 40% locally-sourced ingredients in all restaurants</li>
+          <li><i class="fas fa-car"></i> Electric vehicle fleet for guest transfers</li>
+        </ul>
+      </div>
+      <div class="parallax-rotate reveal-right">
+        <img src="{{ url_for('static', filename='img/dest3.png') }}" alt="Green Nature"
+          style="width:100%;border-radius:var(--radius-lg);box-shadow:var(--shadow);">
+      </div>
+    </div>
+
+    <div class="section-header centered reveal">
+      <h2>Our <span>2030 Goals</span></h2>
+      <div class="section-line centered"></div>
+    </div>
+    <div class="grid-4" style="margin-top:0;">
+      {% for num, unit, label in [
+        ('100%','Renewable','Energy by 2027'),
+        ('Net Zero','Carbon','Emissions by 2030'),
+        ('50%','Food Waste','Reduction by 2026'),
+        ('100K','Trees','Planted by 2030')
+      ] %}
+      <div class="card text-center reveal delay-{{ loop.index }}">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:700;color:var(--accent);">{{ num }}</div>
+        <div style="font-size:.75rem;letter-spacing:2px;text-transform:uppercase;color:var(--accent-dark);font-weight:700;margin:4px 0;">{{ unit }}</div>
+        <div style="font-size:.85rem;color:var(--text2);">{{ label }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

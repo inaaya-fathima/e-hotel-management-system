@@ -1,0 +1,66 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Offers Management — Admin{% endblock %}
+{% block page_title %}Offers & Packages{% endblock %}
+
+{% block content %}
+<div class="action-bar anim-fade-up">
+  <div class="panel-header" style="margin:0">
+    <h1>Offers <span class="text-accent">&amp; Packages</span></h1>
+    <p>Manage special offers visible to customers on the website</p>
+  </div>
+  <a href="{{ url_for('admin_add_offer') }}" class="btn btn-primary">
+    <i class="fas fa-plus"></i> Add New Offer
+  </a>
+</div>
+
+{% if offers %}
+<div class="card anim-fade-up-delay-1" style="padding:0;">
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Image</th><th>Title</th><th>Type</th><th>Price</th><th>Discount</th><th>Valid Until</th><th>Status</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for o in offers %}
+        <tr>
+          <td style="width:60px;">
+            <img src="{{ o['image_url'] }}" style="width:56px;height:40px;object-fit:cover;border-radius:4px;" alt="{{ o['title'] }}">
+          </td>
+          <td style="font-weight:600;">{{ o['title'] }}</td>
+          <td><span class="badge badge-info">{{ o['type'] }}</span></td>
+          <td style="color:var(--accent);font-weight:600;">₹{{ "%.0f"|format(o['price']) }}</td>
+          <td>
+            {% if o['discount_pct'] > 0 %}
+            <span class="badge badge-success">{{ o['discount_pct'] }}% OFF</span>
+            {% else %}
+            <span class="text-muted">—</span>
+            {% endif %}
+          </td>
+          <td style="color:var(--text2);font-size:.82rem;">{{ o['valid_until'] or 'No expiry' }}</td>
+          <td>
+            {% if o['is_active'] %}
+            <span class="badge badge-success">Active</span>
+            {% else %}
+            <span class="badge badge-danger">Inactive</span>
+            {% endif %}
+          </td>
+          <td>
+            <div style="display:flex;gap:6px;">
+              <a href="{{ url_for('admin_edit_offer', offer_id=o['id']) }}" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></a>
+              <form method="post" action="{{ url_for('admin_delete_offer', offer_id=o['id']) }}" style="display:inline">
+                <button class="btn btn-danger btn-sm" data-confirm="Delete '{{ o['title'] }}'?"><i class="fas fa-trash"></i></button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% else %}
+<div class="card"><div class="empty-state"><i class="fas fa-tags"></i><p>No offers created yet.</p></div></div>
+{% endif %}
+{% endblock %}

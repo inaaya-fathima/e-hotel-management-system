@@ -6,19 +6,36 @@
 <div class="action-bar anim-fade-up">
   <div class="panel-header" style="margin:0">
     <h1>Staff <span class="text-accent">Management</span></h1>
-    <p>Manage hotel employees and their roles</p>
+    <p>Manage hotel employees and their branch assignments</p>
   </div>
   <a href="{{ url_for('admin_add_staff') }}" class="btn btn-primary">
     <i class="fas fa-user-plus"></i> Add Staff
   </a>
 </div>
 
+<!-- Branch Filter -->
+<div class="card anim-fade-up-delay-1" style="padding:16px 20px;margin-bottom:0;">
+  <form method="get" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+    <label style="font-size:.82rem;font-weight:600;color:var(--text2);white-space:nowrap;"><i class="fas fa-filter" style="color:var(--accent);margin-right:6px;"></i> Filter by Branch:</label>
+    <select name="branch" class="form-control" style="width:auto;padding:8px 14px;font-size:.85rem;" onchange="this.form.submit()">
+      <option value="">All Branches</option>
+      {% for b in branches %}
+      <option value="{{ b }}" {{ 'selected' if selected_branch == b else '' }}>{{ b }}</option>
+      {% endfor %}
+    </select>
+    {% if selected_branch %}
+    <a href="{{ url_for('admin_staff') }}" class="btn btn-outline btn-sm"><i class="fas fa-times"></i> Clear</a>
+    {% endif %}
+    <span style="font-size:.8rem;color:var(--text2);margin-left:auto;">{{ staff|length }} staff member(s)</span>
+  </form>
+</div>
+
 {% if staff %}
-<div class="card anim-fade-up-delay-1" style="padding:0">
+<div class="card anim-fade-up-delay-1" style="padding:0;margin-top:0;">
   <div class="table-wrapper">
     <table>
       <thead>
-        <tr><th>Name</th><th>Role</th><th>Username</th><th>Contact</th><th>Salary</th><th>Actions</th></tr>
+        <tr><th>Name</th><th>Role</th><th>Assigned Branch</th><th>Current Task</th><th>Username</th><th>Contact</th><th>Salary</th><th>Actions</th></tr>
       </thead>
       <tbody>
         {% for s in staff %}
@@ -32,6 +49,18 @@
             </div>
           </td>
           <td><span class="badge badge-secondary">{{ s['role'] }}</span></td>
+          <td>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <i class="fas fa-map-marker-alt" style="color:var(--accent);font-size:.75rem;"></i>
+              <span style="font-size:.82rem;color:var(--text2);">{{ s['assigned_branch'] or '—' }}</span>
+            </div>
+          </td>
+          <td>
+            <form method="post" action="{{ url_for('admin_allocate_job', staff_id=s['id']) }}" style="display:flex;gap:4px;">
+              <input type="text" name="task" value="{{ s['current_task'] or '' }}" class="form-control" style="width:120px;padding:4px 8px;font-size:.75rem;" placeholder="Assign task...">
+              <button type="submit" class="btn btn-outline btn-sm" style="padding:4px 8px;"><i class="fas fa-check"></i></button>
+            </form>
+          </td>
           <td style="color:var(--text2)">{{ s['username'] }}</td>
           <td style="color:var(--text2)">{{ s['contact'] or '—' }}</td>
           <td style="color:var(--success);font-weight:600">₹{{ "%.0f"|format(s['salary']) }}</td>

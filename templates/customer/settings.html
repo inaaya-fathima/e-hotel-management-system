@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Account Settings — E-Hotel{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container" style="max-width:720px;margin:0 auto;">
+    <div class="panel-header anim-fade-up">
+      <h1><i class="fas fa-cog text-accent"></i> Account Settings</h1>
+      <p>Manage your profile, security, and account preferences.</p>
+    </div>
+
+    <!-- ── UPDATE PROFILE ── -->
+    <div class="card anim-fade-up mb-3">
+      <div class="card-header">
+        <h2 class="card-title"><i class="fas fa-user text-accent"></i> Profile Information</h2>
+      </div>
+      <form method="post" action="{{ url_for('customer_settings') }}">
+        <input type="hidden" name="action" value="update_profile">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" name="name" class="form-control" value="{{ user['name'] }}" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input type="email" name="email" class="form-control" value="{{ user['email'] }}" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone Number</label>
+          <input type="tel" name="phone" class="form-control" value="{{ user['phone'] or '' }}" placeholder="+91 XXXXX XXXXX">
+        </div>
+        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Changes</button>
+      </form>
+    </div>
+
+    <!-- ── CHANGE PASSWORD ── -->
+    <div class="card anim-fade-up mb-3">
+      <div class="card-header">
+        <h2 class="card-title"><i class="fas fa-lock text-accent"></i> Change Password</h2>
+      </div>
+      <form method="post" action="{{ url_for('customer_settings') }}">
+        <input type="hidden" name="action" value="change_password">
+        <div class="form-group">
+          <label class="form-label">Current Password</label>
+          <input type="password" name="old_password" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">New Password</label>
+          <input type="password" name="new_password" class="form-control" minlength="6" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirm New Password</label>
+          <input type="password" name="confirm_password" class="form-control" minlength="6" required>
+        </div>
+        <button type="submit" class="btn btn-warning"><i class="fas fa-key"></i> Update Password</button>
+      </form>
+    </div>
+
+    <!-- ── DELETE ACCOUNT ── -->
+    <div class="card anim-fade-up" style="border-color: var(--danger);">
+      <div class="card-header" style="border-bottom-color: rgba(204,51,51,.2);">
+        <h2 class="card-title" style="color:var(--danger);"><i class="fas fa-exclamation-triangle"></i> Danger Zone</h2>
+      </div>
+      <p style="color:var(--text2); font-size:.88rem; margin-bottom:20px;">
+        Permanently deleting your account will remove all your personal data, bookings history, and preferences. 
+        <strong>This action cannot be undone.</strong>
+      </p>
+      <form method="post" action="{{ url_for('customer_settings') }}" onsubmit="return confirm('This will permanently delete your account. Are you absolutely sure?');">
+        <input type="hidden" name="action" value="delete_account">
+        <div class="form-group">
+          <label class="form-label" style="color:var(--danger);">Type DELETE to confirm</label>
+          <input type="text" name="confirm_delete" class="form-control" placeholder="Type DELETE" pattern="DELETE" required>
+        </div>
+        <button type="submit" class="btn btn-danger"><i class="fas fa-trash-alt"></i> Delete My Account</button>
+      </form>
+    </div>
+
+    <div style="margin-top:20px;text-align:center;">
+      <a href="{{ url_for('customer_dashboard') }}" class="btn btn-outline">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}

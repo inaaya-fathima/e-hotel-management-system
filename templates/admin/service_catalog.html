@@ -1,0 +1,112 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Service Catalog — Admin{% endblock %}
+{% block page_title %}Service Price Catalog{% endblock %}
+
+{% block content %}
+<div class="panel-header anim-fade-up">
+  <h1>Service <span class="text-accent">Price Catalog</span></h1>
+  <p>Set fixed prices for all room services. These prices are automatically applied when guests request services.</p>
+</div>
+
+<!-- Add new service -->
+<div class="card anim-fade-up-delay-1" style="margin-bottom:24px;">
+  <div class="card-header">
+    <h2 class="card-title"><i class="fas fa-plus-circle text-accent"></i> Add New Service</h2>
+  </div>
+  <form method="post" action="{{ url_for('admin_add_service_item') }}" style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;">
+    <div class="form-group" style="flex:2;min-width:200px;margin:0;">
+      <label class="form-label">Service Name *</label>
+      <input type="text" class="form-control" name="service_name" placeholder="e.g. Pillow Menu" required>
+    </div>
+    <div class="form-group" style="flex:1;min-width:120px;margin:0;">
+      <label class="form-label">Price (₹)</label>
+      <input type="number" class="form-control" name="price" placeholder="0" min="0" step="0.01">
+    </div>
+    <div class="form-group" style="flex:3;min-width:200px;margin:0;">
+      <label class="form-label">Description</label>
+      <input type="text" class="form-control" name="description" placeholder="Short description of service">
+    </div>
+    <button type="submit" class="btn btn-primary" style="flex-shrink:0;">
+      <i class="fas fa-plus"></i> Add Service
+    </button>
+  </form>
+</div>
+
+<!-- Service catalog table -->
+{% if catalog %}
+<div class="card anim-fade-up-delay-2" style="padding:0;">
+  <div class="card-header" style="padding:16px 20px;">
+    <h2 class="card-title"><i class="fas fa-tags text-accent"></i> Current Service Prices</h2>
+    <span style="font-size:.8rem;color:var(--text2);">{{ catalog|length }} services defined</span>
+  </div>
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr><th>Service Name</th><th>Description</th><th>Fixed Price (₹)</th><th>Status</th><th>Update Price</th><th>Toggle</th></tr>
+      </thead>
+      <tbody>
+        {% for item in catalog %}
+        <tr style="{{ 'opacity:.5;' if not item['is_active'] else '' }}">
+          <td>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="fas fa-concierge-bell" style="color:#fff;font-size:.75rem;"></i>
+              </div>
+              <strong>{{ item['service_name'] }}</strong>
+            </div>
+          </td>
+          <td style="color:var(--text2);font-size:.82rem;max-width:220px;">{{ item['description'] or '—' }}</td>
+          <td style="color:var(--accent);font-weight:700;font-size:1.05rem;">
+            {% if item['price'] == 0 %}<span style="color:var(--success);">Complimentary</span>{% else %}₹{{ "%.0f"|format(item['price']) }}{% endif %}
+          </td>
+          <td>
+            <span class="status-pill {{ 'pill-confirmed' if item['is_active'] else 'pill-rejected' }}">
+              {{ 'Active' if item['is_active'] else 'Inactive' }}
+            </span>
+          </td>
+          <td>
+            <form method="post" action="{{ url_for('admin_update_service_price', item_id=item['id']) }}" style="display:flex;gap:8px;align-items:center;">
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                <input type="number" name="price" value="{{ item['price'] }}" min="0" step="0.01"
+                       class="form-control" style="width:110px;padding:6px 10px;font-size:.85rem;">
+                <input type="text" name="description" value="{{ item['description'] or '' }}"
+                       class="form-control" style="width:200px;padding:6px 10px;font-size:.8rem;" placeholder="Description...">
+              </div>
+              <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-save"></i> Save</button>
+            </form>
+          </td>
+          <td>
+            <form method="post" action="{{ url_for('admin_toggle_service', item_id=item['id']) }}">
+              <button type="submit" class="btn {{ 'btn-danger' if item['is_active'] else 'btn-success' }} btn-sm">
+                <i class="fas fa-{{ 'pause' if item['is_active'] else 'play' }}"></i>
+                {{ 'Disable' if item['is_active'] else 'Enable' }}
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% else %}
+<div class="card"><div class="empty-state"><i class="fas fa-tags"></i><p>No services in catalog yet.</p></div></div>
+{% endif %}
+
+<!-- Info box -->
+<div class="card anim-fade-up" style="margin-top:24px;background:linear-gradient(135deg,rgba(var(--accent-rgb),.06),rgba(var(--accent2-rgb),.04));border:1px solid rgba(var(--accent-rgb),.2);">
+  <div style="display:flex;gap:14px;align-items:flex-start;">
+    <i class="fas fa-info-circle" style="color:var(--accent);font-size:1.2rem;flex-shrink:0;margin-top:2px;"></i>
+    <div>
+      <div style="font-weight:600;margin-bottom:6px;">How Service Pricing Works</div>
+      <ul style="color:var(--text2);font-size:.82rem;line-height:1.8;list-style:disc;padding-left:16px;">
+        <li>Prices set here are <strong>automatically applied</strong> when a guest requests a service from their dashboard.</li>
+        <li>The service charge is <strong>immediately added to their bill</strong> along with GST recalculation.</li>
+        <li>Services set to ₹0 are marked as <strong>Complimentary</strong> and shown to guests at no charge.</li>
+        <li>Disabled services are <strong>hidden from guests</strong> and cannot be requested.</li>
+        <li>Only the admin can change these prices — guests cannot modify service charges.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

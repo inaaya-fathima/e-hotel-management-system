@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}{{ offer['title'] }} | Offers | E-Hotel{% endblock %}
+{% block content %}
+<div style="position:relative;height:55vh;overflow:hidden;display:flex;align-items:flex-end;">
+  <img src="{{ offer['image_url'] }}" alt="{{ offer['title'] }}"
+    style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(26,18,9,.9),rgba(0,0,0,.2));"></div>
+  <div class="container" style="position:relative;z-index:1;padding-bottom:60px;">
+    <div class="section-tag" style="color:var(--accent2);"><i class="fas fa-star"></i>&nbsp; {{ offer['type'] }}</div>
+    <h1 style="font-family:'Cormorant Garamond',serif;font-size:4rem;color:#fff;font-weight:700;">{{ offer['title'] }}</h1>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+    <div class="grid-2" style="gap:60px;align-items:start;">
+      <div>
+        <h2>Package <span>Details</span></h2>
+        <div class="section-line"></div>
+        <p style="color:var(--text2);margin-top:20px;line-height:1.8;font-size:1.05rem;">{{ offer['description'] }}</p>
+        
+        <h3 style="margin-top:40px;margin-bottom:20px;">What's Included:</h3>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:12px;">
+          {% for feature in offer['features'].split('|') %}
+          <li><i class="fas fa-check text-accent" style="margin-right:10px;"></i> {{ feature }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="card" style="position:sticky;top:100px;">
+        <h3 style="margin-bottom:15px;text-align:center;">Book This Offer</h3>
+        <p style="text-align:center;color:var(--text2);font-size:0.9rem;margin-bottom:20px;">Contact our reservations team to check dates and claim this offer.</p>
+        <a href="{{ url_for('contact') }}" class="btn btn-primary" style="width:100%;justify-content:center;">Inquire Now</a>
+        <hr style="border:0;border-top:1px solid var(--border);margin:20px 0;">
+        <p style="font-size:0.8rem;color:var(--text2);text-align:center;">Or book a stay directly online to unlock standard rates.</p>
+        <a href="{{ url_for('destinations') }}" class="btn btn-outline" style="width:100%;justify-content:center;margin-top:10px;">Browse Destinations</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

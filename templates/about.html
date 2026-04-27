@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% block title %}About E-Hotel — Our Story{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<div style="position:relative;height:50vh;overflow:hidden;display:flex;align-items:flex-end;">
+  <img src="{{ url_for('static', filename='img/lobby.png') }}" alt="E-Hotel Lobby"
+    style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(26,18,9,.88),rgba(0,0,0,.2));"></div>
+  <div class="container" style="position:relative;z-index:1;padding-bottom:60px;">
+    <div class="section-tag" style="color:var(--accent2);"><i class="fas fa-award"></i>&nbsp; Our Heritage</div>
+    <h1 style="font-family:'Cormorant Garamond',serif;font-size:4rem;color:#fff;font-weight:700;">About <span style="color:var(--accent2)">E-Hotel</span></h1>
+  </div>
+</div>
+
+<!-- Story Section -->
+<section class="section" id="story">
+  <div class="container">
+    <div class="grid-2" style="align-items:center;gap:64px;">
+      <div class="anim-fade-up">
+        <div class="section-tag"><i class="fas fa-scroll"></i>&nbsp; Our Story</div>
+        <h2>A <span>Legacy</span> of Luxury</h2>
+        <div class="section-line"></div>
+        <p style="color:var(--text2);margin-top:24px;line-height:1.9;font-size:1rem;">Founded with a passion for hospitality, E-Hotel has grown into a landmark of luxury and culture. From our very first guest, we committed to offering not just a room, but an experience that lingers in the memory.</p>
+        <p style="color:var(--text2);margin-top:14px;line-height:1.9;font-size:1rem;">Every property in our collection tells a story — of the city it inhabits, the craftsmanship in its architecture, and the warmth of its people.</p>
+      </div>
+      <div class="anim-scale-in">
+        <img src="{{ url_for('static', filename='img/history.png') }}" alt="Our History"
+          style="width:100%;height:420px;object-fit:cover;border-radius:var(--radius-lg);box-shadow:var(--shadow);">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Team Section -->
+<section class="section" id="team" style="background:var(--bg2);">
+  <div class="container">
+    <div class="section-header centered">
+      <div class="section-tag" style="justify-content:center;"><i class="fas fa-users"></i>&nbsp; People Behind the Magic</div>
+      <h2>Meet Our <span>Team</span></h2>
+      <div class="section-line centered"></div>
+    </div>
+    <div class="grid-2" style="align-items:center;gap:48px;margin-bottom:48px;">
+      <div>
+        <img src="{{ url_for('static', filename='img/team.png') }}" alt="Our Team"
+          style="width:100%;height:380px;object-fit:cover;border-radius:var(--radius-lg);box-shadow:var(--shadow);">
+      </div>
+      <div class="anim-fade-up">
+        <h3 style="font-family:'Cormorant Garamond',serif;font-size:2rem;margin-bottom:18px;">World-Class Professionals</h3>
+        <p style="color:var(--text2);line-height:1.9;margin-bottom:14px;">Our team of experts brings decades of hospitality experience from Michelin-starred kitchens to Forbes Travel Guide rated resorts. Every member shares a single purpose: your happiness.</p>
+        <p style="color:var(--text2);line-height:1.9;">Trained in the finest traditions of service and equipped with a genuine desire to connect, our staff transforms a stay into a memory.</p>
+        <div class="grid-2" style="margin-top:32px;gap:16px;">
+          {% for num, label in [('200+','Team Members'),('15','Years of Service'),('10','Awards Won'),('99%','Guest Satisfaction')] %}
+          <div style="text-align:center;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow-soft);">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:2rem;color:var(--accent);font-weight:700;">{{ num }}</div>
+            <div style="font-size:.72rem;letter-spacing:1.5px;color:var(--text2);text-transform:uppercase;margin-top:4px;">{{ label }}</div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Awards Section -->
+<section class="section" id="awards">
+  <div class="container">
+    <div class="section-header centered">
+      <div class="section-tag" style="justify-content:center;"><i class="fas fa-trophy"></i>&nbsp; Recognition</div>
+      <h2>Awards &amp; <span>Accolades</span></h2>
+      <div class="section-line centered"></div>
+    </div>
+    <div class="grid-3">
+      {% for icon, award, org in [
+        ('fa-star','Best Luxury Hotel','India Travel Awards 2023'),
+        ('fa-medal','5-Star Excellence','Hospitality Guild of India'),
+        ('fa-leaf','Sustainable Tourism','Green Earth Foundation 2023'),
+        ('fa-utensils','Best Restaurant','Culinary Excellence Awards'),
+        ('fa-spa','Finest Spa Resort','Asia Spa Awards 2023'),
+        ('fa-concierge-bell','Best Concierge Service','Forbes Travel Guide')
+      ] %}
+      <div class="card anim-fade-up" style="text-align:center;">
+        <div style="font-size:2rem;color:var(--accent);margin-bottom:14px;"><i class="fas {{ icon }}"></i></div>
+        <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;margin-bottom:6px;">{{ award }}</h3>
+        <p style="font-size:.8rem;color:var(--text2);">{{ org }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Gallery Section -->
+<section class="section" style="background:var(--bg2);" id="gallery">
+  <div class="container">
+    <div class="section-header centered">
+      <h2>Inside <span>E-Hotel</span></h2>
+      <div class="section-line centered"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:220px 220px;gap:14px;">
+      <div class="img-card" style="grid-column:span 2;border-radius:var(--radius-lg);">
+        <img src="{{ url_for('static', filename='img/lobby.png') }}" alt="Grand Lobby" style="width:100%;height:100%;">
+        <div class="img-card-overlay"><h3>Grand Lobby</h3><p>Welcoming with timeless elegance</p></div>
+      </div>
+      <div class="img-card" style="border-radius:var(--radius-lg);">
+        <img src="{{ url_for('static', filename='img/suite.png') }}" alt="Presidential Suite" style="width:100%;height:100%;">
+        <div class="img-card-overlay"><h3>Presidential Suite</h3><p>The pinnacle of accommodation</p></div>
+      </div>
+      <div class="img-card" style="border-radius:var(--radius-lg);">
+        <img src="{{ url_for('static', filename='img/dining.png') }}" alt="Fine Dining" style="width:100%;height:100%;">
+        <div class="img-card-overlay"><h3>Fine Dining</h3><p>Culinary art in every dish</p></div>
+      </div>
+      <div class="img-card" style="grid-column:span 2;border-radius:var(--radius-lg);">
+        <img src="{{ url_for('static', filename='img/pool.png') }}" alt="Infinity Pool" style="width:100%;height:100%;">
+        <div class="img-card-overlay"><h3>Infinity Pool</h3><p>Horizons that stretch to forever</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Contact Section -->
+<section class="section" id="contact">
+  <div class="container">
+    <div class="grid-2" style="align-items:center;gap:64px;">
+      <div>
+        <div class="section-tag"><i class="fas fa-envelope"></i>&nbsp; Get in Touch</div>
+        <h2>Contact <span>Us</span></h2>
+        <div class="section-line"></div>
+        <p style="color:var(--text2);margin-top:20px;line-height:1.8;">Let us know how we can serve you better. Our team will respond within 24 hours.</p>
+        <div style="margin-top:28px;display:flex;flex-direction:column;gap:16px;">
+          {% for icon, label, val in [
+            ('fa-phone','Reservations','+91 98765 43210'),
+            ('fa-envelope','Email','reservations@ehotel.com'),
+            ('fa-map-marker-alt','Address','123, Heritage Avenue, Jaipur — 302001')
+          ] %}
+          <div style="display:flex;gap:16px;align-items:flex-start;">
+            <div style="width:44px;height:44px;border-radius:50%;background:rgba(201,168,76,.1);border:1px solid var(--accent);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:1rem;">
+              <i class="fas {{ icon }}"></i>
+            </div>
+            <div>
+              <div style="font-size:.7rem;letter-spacing:2px;color:var(--text2);text-transform:uppercase;margin-bottom:2px;">{{ label }}</div>
+              <div style="font-size:.95rem;font-weight:500;">{{ val }}</div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div>
+        <img src="{{ url_for('static', filename='img/team.png') }}" alt="Contact Us"
+          style="width:100%;height:380px;object-fit:cover;border-radius:var(--radius-lg);box-shadow:var(--shadow);">
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

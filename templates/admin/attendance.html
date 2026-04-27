@@ -5,30 +5,51 @@
 {% block content %}
 <div class="panel-header anim-fade-up">
   <h1>Staff <span class="text-accent">Attendance</span></h1>
-  <p>Track attendance records and salary summary</p>
+  <p>Track attendance records and view auto-generated monthly salary bills</p>
 </div>
 
 <!-- Month Filter -->
-<div class="card anim-fade-up-delay-1 mb-3">
-  <form method="get" action="{{ url_for('admin_attendance') }}" style="display:flex;gap:12px;align-items:center">
-    <label class="form-label" style="margin:0">Select Month:</label>
+<div class="card anim-fade-up-delay-1" style="padding:16px 20px;margin-bottom:0;">
+  <form method="get" action="{{ url_for('admin_attendance') }}" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+    <label class="form-label" style="margin:0;font-weight:600;"><i class="fas fa-calendar" style="color:var(--accent);margin-right:6px;"></i>Select Month:</label>
     <input type="month" name="month" class="form-control" style="width:auto" value="{{ current_month }}" onchange="this.form.submit()">
+    <span style="color:var(--text2);font-size:.8rem;">Showing data for <strong>{{ current_month }}</strong></span>
   </form>
 </div>
 
-<div class="grid-2">
+<!-- Monthly Salary Bill Banner -->
+<div class="card anim-fade-up" style="background:linear-gradient(135deg,var(--accent),var(--accent2));padding:24px;margin-top:0;">
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;">
+    <div>
+      <div style="font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.75);margin-bottom:4px;">Auto-Generated Bill</div>
+      <h3 style="color:#fff;font-family:'Cormorant Garamond',serif;font-size:1.5rem;margin-bottom:4px;">Monthly Salary Report — {{ current_month }}</h3>
+      <p style="color:rgba(255,255,255,.85);font-size:.85rem;">
+        Total staff payroll based on attendance (salary ÷ 26 working days × days present):
+        <strong style="font-size:1.1rem;margin-left:8px;">
+          ₹{{ "%.0f"|format(summary | sum(attribute='earned_salary') if summary else 0) }}
+        </strong>
+      </p>
+    </div>
+    <button onclick="window.print()" class="btn" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);backdrop-filter:blur(4px);">
+      <i class="fas fa-file-invoice"></i> Print / Send Salary Bill
+    </button>
+  </div>
+</div>
+
+<div class="grid-2" style="margin-top:0;">
   <!-- Attendance History Table -->
   <div class="card anim-fade-up-delay-2" style="padding:0">
     <div class="card-header" style="border-bottom:1px solid var(--border);padding:16px"><h2 class="card-title"><i class="fas fa-list-alt text-accent"></i> Attendance History</h2></div>
     {% if records %}
-    <div class="table-wrapper" style="max-height: 480px; overflow-y: auto;">
+    <div class="table-wrapper" style="max-height: 500px; overflow-y: auto;">
       <table>
         <thead>
           <tr>
             <th>Date</th>
             <th>Staff</th>
+            <th>Branch</th>
             <th>Status</th>
-            <th>Time Marked</th>
+            <th>Marked At</th>
           </tr>
         </thead>
         <tbody>
@@ -39,6 +60,7 @@
               <div style="font-weight:600">{{ r['name'] }}</div>
               <div class="text-muted" style="font-size:0.8rem">{{ r['role'] }}</div>
             </td>
+            <td style="color:var(--text2);font-size:.78rem;">{{ r['assigned_branch'] or '—' }}</td>
             <td>
               <span class="status-pill {{ 'pill-confirmed' if r['status']=='Present' else 'pill-rejected' }}">
                 {{ r['status'] }}
@@ -57,38 +79,59 @@
     {% endif %}
   </div>
 
-  <!-- Salary Summary Table -->
+  <!-- Salary Summary / Auto Bill -->
   <div class="card anim-fade-up-delay-3" style="padding:0">
-    <div class="card-header" style="border-bottom:1px solid var(--border);padding:16px"><h2 class="card-title"><i class="fas fa-rupee-sign text-accent"></i> Salary Summary</h2></div>
+    <div class="card-header" style="border-bottom:1px solid var(--border);padding:16px">
+      <h2 class="card-title"><i class="fas fa-rupee-sign text-accent"></i> Salary Bill Summary</h2>
+      <span style="font-size:.75rem;color:var(--text2);">Auto-calculated based on attendance</span>
+    </div>
     {% if summary %}
-    <div class="table-wrapper" style="max-height: 480px; overflow-y: auto;">
+    <div class="table-wrapper">
       <table>
         <thead>
           <tr>
             <th>Staff</th>
+            <th>Branch</th>
             <th>Days Present</th>
-            <th>Est. Salary</th>
+            <th>Per Day</th>
+            <th>Salary Earned</th>
           </tr>
         </thead>
         <tbody>
           {% for s in summary %}
           <tr>
             <td>
-              <div style="font-weight:600">{{ s['name'] }}</div>
-              <div class="text-muted" style="font-size:0.8rem">Base: ₹{{ "%.0f"|format(s['salary'] or 0) }}/mo</div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div style="width:30px;height:30px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:#fff;flex-shrink:0;">
+                  {{ s['name'][0].upper() }}
+                </div>
+                <div>
+                  <div style="font-weight:600;font-size:.88rem;">{{ s['name'] }}</div>
+                  <div class="text-muted" style="font-size:.75rem;">{{ s['role'] }} · ₹{{ "%.0f"|format(s['salary'] or 0) }}/mo</div>
+                </div>
+              </div>
             </td>
-            <td><span class="badge badge-info">{{ s['days_present'] }} days</span></td>
-            <td style="color:var(--accent);font-weight:700">
-              {% set daily_wage = (s['salary'] or 0) / 30 %}
-              ₹{{ "%.0f"|format(daily_wage * s['days_present']) }}
+            <td style="color:var(--text2);font-size:.78rem;max-width:120px;">{{ s['assigned_branch'] or '—' }}</td>
+            <td><span class="badge badge-info">{{ s['days_present'] }} / 26</span></td>
+            <td style="color:var(--text2);font-size:.85rem;">₹{{ "%.0f"|format((s['salary'] or 0) / 26) }}</td>
+            <td style="color:var(--accent);font-weight:700;font-size:1rem;">
+              ₹{{ "%.0f"|format(s['earned_salary'] or 0) }}
             </td>
           </tr>
           {% endfor %}
         </tbody>
+        <tfoot>
+          <tr style="background:var(--bg2);">
+            <td colspan="4" style="font-weight:700;font-size:.9rem;padding:12px 16px;"><i class="fas fa-sigma" style="color:var(--accent);margin-right:8px;"></i>Total Payroll for {{ current_month }}</td>
+            <td style="color:var(--accent);font-weight:700;font-size:1.1rem;padding:12px 16px;">
+              ₹{{ "%.0f"|format(summary | sum(attribute='earned_salary') if summary else 0) }}
+            </td>
+          </tr>
+        </tfoot>
       </table>
     </div>
     {% else %}
-    <div class="empty-state" style="padding:40px"><i class="fas fa-users-slash"></i><p>No staff summary available.</p></div>
+    <div class="empty-state" style="padding:40px"><i class="fas fa-users-slash"></i><p>No staff data available.</p></div>
     {% endif %}
   </div>
 </div>

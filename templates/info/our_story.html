@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Our Story — E-Hotel{% endblock %}
+{% block content %}
+
+<div style="position:relative;height:50vh;overflow:hidden;display:flex;align-items:flex-end;background:#0a0800;">
+  <img src="{{ url_for('static', filename='img/history.png') }}" alt="Our Story"
+    style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.6;">
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(10,6,0,.95),transparent);"></div>
+  <div class="container" style="position:relative;z-index:1;padding-bottom:60px;">
+    <div class="section-tag" style="color:var(--accent2);"><i class="fas fa-book-open"></i>&nbsp; Our Heritage</div>
+    <h1 style="font-family:'Cormorant Garamond',serif;font-size:clamp(2.4rem,5vw,4rem);color:#fff;font-weight:700;">Our <span style="color:var(--accent2);">Story</span></h1>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+    <div class="grid-2" style="gap:64px;align-items:start;">
+      <div class="reveal-left">
+        <div class="section-tag"><i class="fas fa-star"></i>&nbsp; Founded 1924</div>
+        <h2>A Century of <span>Extraordinary Hospitality</span></h2>
+        <div class="section-line"></div>
+        <p style="color:var(--text2);margin-top:24px;line-height:1.9;">
+          E-Hotel was born from a single vision — to create a place where guests felt not merely accommodated, but genuinely celebrated. Founded in 1924 by the Mehta family in the heart of Jaipur, our first property was a converted royal haveli that blended Rajasthani grandeur with modern comfort.
+        </p>
+        <p style="color:var(--text2);margin-top:16px;line-height:1.9;">
+          Over a century, we have grown from one heritage property into a chain spanning six of India's most iconic destinations. Through every decade, our philosophy has remained unchanged: every guest deserves the very best.
+        </p>
+        <p style="color:var(--text2);margin-top:16px;line-height:1.9;">
+          Today, E-Hotel stands as one of India's most celebrated luxury hospitality brands — honoured with numerous awards, loved by millions of guests, and home to a family of over 500 dedicated hospitality professionals.
+        </p>
+      </div>
+      <div class="reveal-right">
+        <div style="display:flex;flex-direction:column;gap:24px;">
+          {% for year, event in [
+            ('1924','First E-Hotel opens in a converted royal haveli in Jaipur'),
+            ('1958','Expansion to Goa — first beach resort property'),
+            ('1976','Kerala Backwater Villas established, pioneering eco-luxury'),
+            ('1995','E-Hotel Mumbai opens — iconic city landmark on Marine Drive'),
+            ('2008','Digital transformation and loyalty programme launch'),
+            ('2024','Century celebration — 6 destinations, 14 properties')
+          ] %}
+          <div class="card reveal" style="padding:20px;display:flex;gap:20px;align-items:flex-start;">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:700;color:var(--accent);min-width:55px;">{{ year }}</div>
+            <div style="color:var(--text2);font-size:.9rem;line-height:1.7;padding-top:4px;">{{ event }}</div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

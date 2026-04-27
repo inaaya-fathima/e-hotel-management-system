@@ -75,3 +75,4 @@ def staff_required(f):
             return redirect(url_for('staff_login'))
         return f(*args, **kwargs)
     return decorated_function
+    

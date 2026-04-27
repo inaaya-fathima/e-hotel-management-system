@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Booking Successful — E-Hotel{% endblock %}
+{% block content %}
+<section class="section" style="min-height: 70vh; display:flex; align-items:center;">
+  <div class="container" style="max-width: 600px; margin: 0 auto;">
+    <div class="card anim-fade-up" style="text-align:center; padding: 40px;">
+      <div style="font-size: 4rem; color: var(--success); margin-bottom: 20px;">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <h2>Booking Confirmed!</h2>
+      <p style="color: var(--text2); margin-bottom: 24px;">Your booking for Room {{ booking['room_number'] }} has been successfully placed. It is currently pending admin approval.</p>
+      
+      <div style="background: var(--bg2); padding: 20px; border-radius: var(--radius); border: 1px solid var(--border); text-align: left;">
+        <h4 style="margin-bottom: 12px;"><i class="fas fa-envelope-open-text" style="color: var(--accent);"></i> Add Further Details</h4>
+        <p style="font-size: .85rem; color: var(--text2); margin-bottom: 16px;">If you have any special requirements, dietary restrictions, or other details you want the hotel staff to know for this booking, please add them below.</p>
+        
+        <form method="post" action="{{ url_for('booking_success', booking_id=booking['id']) }}">
+          <div class="form-group">
+            <textarea name="details" class="form-control" rows="4" placeholder="e.g. Need airport pickup, vegan diet, extra pillows..." required></textarea>
+          </div>
+          <div style="display:flex; gap:10px; margin-top:16px;">
+            <button type="submit" class="btn btn-primary" style="flex:1;"><i class="fas fa-paper-plane"></i> Submit Details</button>
+            <a href="{{ url_for('customer_dashboard') }}" class="btn btn-outline">Skip</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

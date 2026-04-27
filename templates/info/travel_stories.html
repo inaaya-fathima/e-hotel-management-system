@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Travel Stories | E-Hotel{% endblock %}
+{% block content %}
+
+<div style="position:relative;height:45vh;overflow:hidden;display:flex;align-items:flex-end;background:#0a0800;">
+  <img src="{{ url_for('static', filename='img/dest1.png') }}" alt="Travel Stories"
+    style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.55;">
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(10,6,0,.95),transparent);"></div>
+  <div class="container" style="position:relative;z-index:1;padding-bottom:60px;">
+    <div class="section-tag" style="color:var(--accent2);"><i class="fas fa-feather-alt"></i>&nbsp; Guest Chronicles</div>
+    <h1 style="font-family:'Cormorant Garamond',serif;font-size:clamp(2.4rem,5vw,4rem);color:#fff;font-weight:700;">Travel <span style="color:var(--accent2);">Stories</span></h1>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+    <div class="section-header centered reveal">
+      <div class="section-tag" style="justify-content:center;"><i class="fas fa-star"></i>&nbsp; Guest Voices</div>
+      <h2>Memories Made at <span>E-Hotel</span></h2>
+      <div class="section-line centered"></div>
+      <p>Real stories from real guests — moments that became lifelong memories.</p>
+    </div>
+
+    <!-- Featured story -->
+    <div class="card reveal" style="padding:40px;border-left:4px solid var(--accent);margin-bottom:32px;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:20px;right:24px;font-size:4rem;color:rgba(201,168,76,.08);font-family:'Cormorant Garamond',serif;line-height:1;">"</div>
+      <div style="font-size:.72rem;letter-spacing:3px;text-transform:uppercase;color:var(--accent-dark);font-weight:700;margin-bottom:16px;">Featured Story · Jaipur</div>
+      <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.7rem;margin-bottom:16px;">A Royal Rajasthan Wedding</h3>
+      <p style="color:var(--text2);line-height:1.9;font-size:1rem;">
+        "Our wedding at E-Hotel Jaipur was nothing short of a fairy tale. From the moment we arrived, the team made us feel like royalty. The Maharaja Ballroom was breathtaking — crystal chandeliers, fresh marigold arrangements, and the most attentive staff we have ever encountered. Every single detail we had discussed months in advance was executed flawlessly. Our guests are still talking about it. E-Hotel didn't just host our wedding, they created a memory we will treasure for the rest of our lives."
+      </p>
+      <div style="margin-top:20px;display:flex;align-items:center;gap:14px;">
+        <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-dark));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:1.1rem;">S</div>
+        <div>
+          <div style="font-weight:700;">The Sharma Family</div>
+          <div style="font-size:.8rem;color:var(--text2);">New Delhi · Married at E-Hotel Jaipur</div>
+        </div>
+        <div class="stars" style="margin-left:auto;">
+          {% for i in range(5) %}<i class="fas fa-star" style="color:var(--accent);font-size:.9rem;"></i>{% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Story grid -->
+    <div class="grid-3" style="margin-bottom:48px;">
+      {% for initial, name, loc, stay, title, story in [
+        ('A','Alice & Mark','London, UK','Goa Beach Resort','Paradise Found in Goa',
+         'The infinity pool facing the ocean was the most serene experience we have ever had. We watched the sun melt into the Arabian Sea every evening with a cocktail in hand. Pure magic.'),
+        ('R','Rahul Mehta','Bangalore','Kerala Backwater Villas','Backwaters & Bliss',
+         'The traditional houseboat experience combined with the most luxurious teak villa I have ever slept in. Kerala through the lens of E-Hotel is extraordinary — I left feeling completely renewed.'),
+        ('P','Priya & Karthik','Chennai','Himalayan Peak Lodge','A Honeymoon Above the Clouds',
+         'Waking up to snow-capped peaks every morning from our private terrace was something out of a dream. The fireplace, the warm chocolate, the in-room spa — simply perfect.'),
+        ('J','James O\'Brien','Dublin, Ireland','Mumbai Marine Drive Grand','The City That Never Sleeps',
+         'I have stayed in five-star hotels across 30 countries. E-Hotel Mumbai stands proudly among the best. The view from the Skyline Penthouse is unlike anything I have seen.'),
+        ('N','Nisha Agarwal','Pune','Varanasi Ganga Heritage','Spirituality & Serenity',
+         'Watching the Ganga aarti from our hotel balcony at sunrise was a deeply moving experience. E-Hotel balanced spiritual immersion with absolute luxury beautifully.'),
+        ('V','The Verma Family','Singapore','Jaipur City Palace Wing','A Heritage So Alive',
+         'Taking our children to see real Rajasthani frescoes in a five-star hotel room was unforgettable. They learned history and we lived luxury simultaneously.')
+      ] %}
+      <div class="card tilt-card reveal delay-{{ loop.index % 3 + 1 }}" style="padding:28px;position:relative;overflow:hidden;">
+        <div style="font-size:2.5rem;color:rgba(201,168,76,.15);font-family:'Cormorant Garamond',serif;line-height:1;position:absolute;top:12px;right:16px;">"</div>
+        <h4 style="font-family:'Cormorant Garamond',serif;font-size:1.15rem;margin-bottom:10px;">{{ title }}</h4>
+        <p style="font-size:.84rem;color:var(--text2);line-height:1.8;margin-bottom:20px;">{{ story }}</p>
+        <div style="display:flex;align-items:center;gap:10px;border-top:1px solid var(--border);padding-top:16px;">
+          <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-dark));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.9rem;flex-shrink:0;">{{ initial }}</div>
+          <div>
+            <div style="font-size:.85rem;font-weight:600;">{{ name }}</div>
+            <div style="font-size:.75rem;color:var(--accent-dark);">{{ loc }} · {{ stay }}</div>
+          </div>
+          <div class="stars" style="margin-left:auto;">
+            {% for i in range(5) %}<i class="fas fa-star" style="color:var(--accent);font-size:.75rem;"></i>{% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Share story CTA -->
+    <div class="venue-booking-card reveal" style="text-align:center;">
+      <i class="fas fa-feather-alt" style="font-size:2rem;color:var(--accent);margin-bottom:16px;display:block;"></i>
+      <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;margin-bottom:10px;">Share Your E-Hotel Story</h3>
+      <p style="color:var(--text2);margin-bottom:24px;max-width:500px;margin-left:auto;margin-right:auto;">Have you stayed with us? We would love to hear about your experience and feature your story here.</p>
+      <a href="{{ url_for('contact') }}" class="btn btn-primary btn-magnetic">
+        <i class="fas fa-paper-plane"></i> Write to Us
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}

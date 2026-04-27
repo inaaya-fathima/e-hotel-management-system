@@ -1,0 +1,523 @@
+{% extends "base.html" %}
+{% block title %}Experiences — E-Hotel{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Base Overrides for Cinematic Layout */
+  :root {
+    --bg-dark: #0b0b0b;
+    --text-light: #ffffff;
+    --accent-gold: var(--accent);
+  }
+
+  body, html {
+    background-color: var(--bg-dark);
+    color: var(--text-light);
+  }
+
+  .navbar {
+    background: transparent !important;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  
+  .navbar-inner .nav-link, .brand-name {
+    color: #fff !important;
+  }
+  
+  .footer {
+    display: none; /* Hide footer for uninterrupted scrolling or style it dark. We will display it after the section if it is full page. But portfolio layout is usually full page. Let's just make it dark if it shows. */
+  }
+
+  /* Portfolio Container */
+  .portfolio-container {
+    position: relative;
+    /* 6 sections total */
+    height: 600vh;
+    background: var(--bg-dark);
+  }
+
+  .portfolio-sticky-wrapper {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    overflow: hidden;
+  }
+
+  /* Progress Indicator */
+  .prog-indicator {
+    position: absolute;
+    left: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    z-index: 50;
+  }
+
+  .prog-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .prog-dot.active {
+    background: var(--text-light);
+    transform: scale(1.8);
+    box-shadow: 0 0 10px rgba(255,255,255,0.3);
+  }
+
+  /* Left Side: Images Track */
+  .portfolio-left {
+    width: 50%;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+    background: #000;
+  }
+
+  .portfolio-image-track {
+    width: 100%;
+    height: 600vh;
+  }
+
+  .portfolio-image {
+    width: 100%;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .portfolio-image::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, rgba(0,0,0,0.4) 0%, transparent 40%);
+    pointer-events: none;
+  }
+
+  .portfolio-image img {
+    width: 100%;
+    height: 100vh;
+    object-fit: cover;
+    transform: scale(1.1);
+    transition: transform 1.5s cubic-bezier(0.16, 1, 0.3, 1), filter 1s ease;
+    filter: brightness(0.8) grayscale(20%);
+  }
+
+  .portfolio-image.active img {
+    transform: scale(1);
+    filter: brightness(1) grayscale(0%);
+  }
+
+  /* Right Side: Texts */
+  .portfolio-right {
+    width: 50%;
+    height: 100vh;
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: linear-gradient(135deg, var(--bg-dark) 0%, #111111 100%);
+  }
+
+  .portfolio-text-track {
+    position: absolute;
+    inset: 0;
+  }
+
+  .portfolio-text-item {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 12%;
+    opacity: 0;
+    pointer-events: none; /* Make inactive items unclickable */
+    z-index: 10;
+  }
+
+  .portfolio-text-item.active {
+    pointer-events: auto;
+    z-index: 20;
+    opacity: 1;
+  }
+
+  /* Text Elements Initial States */
+  .p-subtitle, .p-title, .p-desc, .p-tags {
+    opacity: 0;
+    transform: translateY(30px);
+    will-change: transform, opacity;
+  }
+
+  .p-subtitle {
+    font-family: 'Jost', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--accent-gold);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .p-subtitle::before {
+    content: '';
+    display: block;
+    width: 30px;
+    height: 1px;
+    background: var(--accent-gold);
+  }
+
+  .p-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(3rem, 5vw, 5rem);
+    font-weight: 700;
+    line-height: 1.05;
+    margin-bottom: 24px;
+    color: var(--text-light);
+    transition: color 0.4s ease;
+  }
+
+  .p-desc {
+    font-family: 'Jost', sans-serif;
+    font-size: 1.05rem;
+    color: rgba(255, 255, 255, 0.65);
+    line-height: 1.8;
+    max-width: 480px;
+    margin-bottom: 40px;
+  }
+
+  .p-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .p-tag {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(4px);
+    padding: 8px 18px;
+    border-radius: 30px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    color: rgba(255, 255, 255, 0.8);
+    cursor: default;
+  }
+
+  .p-tag:hover {
+    background: var(--text-light);
+    color: var(--bg-dark);
+    transform: translateY(-2px);
+  }
+
+  /* Explore Button Sync */
+  .explore-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 40px;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent-gold);
+    text-decoration: none;
+    position: relative;
+    padding-bottom: 4px;
+    overflow: hidden;
+  }
+
+  .explore-btn::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%; height: 1px;
+    background: var(--accent-gold);
+    transform: translateX(-101%);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .explore-btn:hover::after {
+    transform: translateX(0);
+  }
+
+  /* Responsive Design */
+  @media (max-width: 900px) {
+    .portfolio-sticky-wrapper {
+      flex-direction: column;
+    }
+    
+    .portfolio-left, .portfolio-right {
+      width: 100%;
+      height: 50vh;
+    }
+
+    .portfolio-image-track {
+      height: 300vh; /* 6 * 50vh */
+    }
+
+    .portfolio-image {
+      height: 50vh;
+    }
+
+    .portfolio-image img {
+      height: 50vh;
+    }
+
+    .portfolio-text-item {
+      padding: 0 8%;
+    }
+
+    .p-title {
+      font-size: 2.8rem;
+      margin-bottom: 16px;
+    }
+    
+    .p-desc {
+      font-size: 0.95rem;
+      margin-bottom: 24px;
+    }
+    
+    .prog-indicator {
+      display: flex;
+      flex-direction: row;
+      top: 46vh;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      gap: 10px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="portfolio-container" id="portfolioMain">
+  <div class="portfolio-sticky-wrapper">
+    
+    <!-- Progress Indicator -->
+    <div class="prog-indicator">
+      <div class="prog-dot active"></div>
+      <div class="prog-dot"></div>
+      <div class="prog-dot"></div>
+      <div class="prog-dot"></div>
+      <div class="prog-dot"></div>
+      <div class="prog-dot"></div>
+    </div>
+
+    <!-- LEFT SIDE: Image Slideshow -->
+    <div class="portfolio-left">
+      <div class="portfolio-image-track" id="imgTrack">
+        <div class="portfolio-image"><img src="{{ url_for('static', filename='img/dining.png') }}" alt="Fine Dining"></div>
+        <div class="portfolio-image"><img src="{{ url_for('static', filename='img/offers.png') }}" alt="Wellness"></div>
+        <div class="portfolio-image"><img src="{{ url_for('static', filename='img/pool.png') }}" alt="Pool"></div>
+        <div class="portfolio-image"><img src="{{ url_for('static', filename='img/lobby.png') }}" alt="Events Hall"></div>
+        <div class="portfolio-image"><img src="{{ url_for('static', filename='img/wedding.png') }}" alt="Weddings"></div>
+        <div class="portfolio-image"><img src="{{ url_for('static', filename='img/history.png') }}" alt="Business Lounge"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT SIDE: Text Synced Content -->
+    <div class="portfolio-right">
+      <div class="portfolio-text-track" id="textTrack">
+        
+        <!-- Dining -->
+        <div class="portfolio-text-item">
+          <div class="p-subtitle">Culinary Arts</div>
+          <h2 class="p-title">Fine Dining</h2>
+          <p class="p-desc">Embark on a gastronomic journey at our award-winning restaurants, where globally inspired menus meet locally sourced ingredients. Our Michelin-inspired chefs craft each dish as a work of art.</p>
+          <div class="p-tags">
+            <span class="p-tag">Rooftop View</span>
+            <span class="p-tag">Live Tandoor</span>
+            <span class="p-tag">Private Dining</span>
+            <span class="p-tag">Cellar</span>
+          </div>
+          <div><a href="{{ url_for('exp_dining') }}" class="explore-btn">Discover Dining <i class="fas fa-arrow-right"></i></a></div>
+        </div>
+
+        <!-- Wellness -->
+        <div class="portfolio-text-item">
+          <div class="p-subtitle">Rejuvenation</div>
+          <h2 class="p-title">Wellness & Spa</h2>
+          <p class="p-desc">Our world-class spa offers a range of holistic treatments rooted in ancient wisdom and modern technique. Let trained therapists guide you through a journey of total rejuvenation.</p>
+          <div class="p-tags">
+            <span class="p-tag">Massages</span>
+            <span class="p-tag">Steam Room</span>
+            <span class="p-tag">Ayurvedic</span>
+            <span class="p-tag">Yoga</span>
+          </div>
+          <div><a href="{{ url_for('browse_rooms') }}" class="explore-btn">Book Wellness Stay <i class="fas fa-arrow-right"></i></a></div>
+        </div>
+
+        <!-- Pool -->
+        <div class="portfolio-text-item">
+          <div class="p-subtitle">Recreation</div>
+          <h2 class="p-title">Infinity Pool</h2>
+          <p class="p-desc">Our rooftop infinity pool offers breathtaking panoramic views. Lounge on premium sun beds, sip on handcrafted cocktails, and let the world fade away.</p>
+          <div class="p-tags">
+            <span class="p-tag">Rooftop</span>
+            <span class="p-tag">Cabanas</span>
+            <span class="p-tag">Cocktails</span>
+          </div>
+          <div><a href="{{ url_for('browse_rooms') }}" class="explore-btn">Explore Recreation <i class="fas fa-arrow-right"></i></a></div>
+        </div>
+
+        <!-- Events -->
+        <div class="portfolio-text-item">
+          <div class="p-subtitle">Events & Celebrations</div>
+          <h2 class="p-title">Events Hall</h2>
+          <p class="p-desc">From grand birthday bashes to corporate award nights, our state-of-the-art events hall transforms every occasion into an extraordinary memory with 12,000 sq.ft of pure luxury.</p>
+          <div class="p-tags">
+            <span class="p-tag">600 Guests</span>
+            <span class="p-tag">Bespoke AV</span>
+            <span class="p-tag">Grand Ballroom</span>
+          </div>
+          <div><a href="{{ url_for('exp_meetings') }}#book-venue" class="explore-btn">Reserve a Hall <i class="fas fa-arrow-right"></i></a></div>
+        </div>
+
+        <!-- Weddings -->
+        <div class="portfolio-text-item">
+          <div class="p-subtitle">Celebrations</div>
+          <h2 class="p-title">Timeless Weddings</h2>
+          <p class="p-desc">Make your most special day uniquely extraordinary. Our expert wedding planners bring every dream to life — from intimate garden ceremonies to grand palatial celebrations.</p>
+          <div class="p-tags">
+            <span class="p-tag">Wedding Planners</span>
+            <span class="p-tag">Bridal Suite</span>
+            <span class="p-tag">Palatial Setup</span>
+          </div>
+          <div><a href="{{ url_for('exp_wedding') }}" class="explore-btn">Plan Your Wedding <i class="fas fa-arrow-right"></i></a></div>
+        </div>
+
+        <!-- Lounge -->
+        <div class="portfolio-text-item">
+          <div class="p-subtitle">Business</div>
+          <h2 class="p-title">Business Lounge</h2>
+          <p class="p-desc">Built for the modern executive — our premium business lounge offers high-speed fibre internet, private meeting rooms, printing facilities, and curated refreshments.</p>
+          <div class="p-tags">
+            <span class="p-tag">1Gbps Wi-Fi</span>
+            <span class="p-tag">Video Conference</span>
+            <span class="p-tag">Café</span>
+          </div>
+          <div><a href="{{ url_for('exp_business_lounge') }}" class="explore-btn">View Executive Offers <i class="fas fa-arrow-right"></i></a></div>
+        </div>
+
+      </div>
+    </div>
+    
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+    
+    const isMobile = window.innerWidth <= 900;
+    const sectionsCount = 6;
+    
+    const textItems = document.querySelectorAll('.portfolio-text-item');
+    const images = document.querySelectorAll('.portfolio-image');
+    const dots = document.querySelectorAll('.prog-dot');
+    
+    // Initial Setup
+    window.currentActiveIdx = -1;
+
+    // Helper to change text states
+    function activateSection(idx) {
+      if(window.currentActiveIdx === idx) return;
+      const prevIdx = window.currentActiveIdx;
+      window.currentActiveIdx = idx;
+
+      // Dots update
+      dots.forEach((dot, i) => dot.classList.toggle('active', i === idx));
+      
+      // Images update
+      images.forEach((img, i) => img.classList.toggle('active', i === idx));
+
+      // Texts Fade Out Previous
+      if(prevIdx !== -1 && textItems[prevIdx]) {
+        gsap.killTweensOf(textItems[prevIdx].querySelectorAll('*'));
+        textItems[prevIdx].classList.remove('active');
+        
+        // Slide up and fade out smoothly
+        gsap.to(textItems[prevIdx].querySelectorAll('.p-subtitle, .p-title, .p-desc, .p-tags, .explore-btn'), {
+          y: -40,
+          opacity: 0,
+          duration: 0.4,
+          stagger: 0.05,
+          ease: "power2.in"
+        });
+      }
+
+      // Texts Fade In Current
+      if(textItems[idx]) {
+        textItems[idx].classList.add('active');
+        gsap.killTweensOf(textItems[idx].querySelectorAll('*'));
+        
+        // Slight delay for the new text to stagger in beautifully
+        gsap.fromTo(textItems[idx].querySelectorAll('.p-subtitle, .p-title, .p-desc, .p-tags, .explore-btn'), {
+          y: 40,
+          opacity: 0
+        }, {
+          y: 0,
+          opacity: 1,
+          duration: 0.7,
+          stagger: 0.1,
+          ease: "power3.out",
+          delay: 0.2
+        });
+      }
+    }
+
+    // Initialize first section
+    activateSection(0);
+
+    // Main Timeline
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: "#portfolioMain",
+        start: "top top",
+        end: "bottom bottom",
+        scrub: 1,
+        snap: {
+          snapTo: 1 / (sectionsCount - 1),
+          duration: 0.5,
+          ease: "power2.inOut"
+        },
+        onUpdate: (self) => {
+          // Calculate active index based on scroll progress
+          const progress = self.progress;
+          // When progress hits breakpoints like 0.1, 0.3, 0.5, 0.7, 0.9, the index shifts
+          const idx = Math.round(progress * (sectionsCount - 1));
+          activateSection(Math.max(0, Math.min(idx, sectionsCount - 1)));
+        }
+      }
+    });
+
+    // Translate the Image Track vertically inside the sticky container
+    // We move it up by exactly (totalHeight - containerHeight)
+    // For mobile it's 50vh pieces, for desktop 100vh pieces
+    const imgTrack = document.getElementById('imgTrack');
+    tl.to(imgTrack, {
+      y: () => -(imgTrack.scrollHeight - (isMobile ? window.innerHeight / 2 : window.innerHeight)),
+      ease: "none"
+    }, 0);
+
+  }
+});
+</script>
+{% endblock %}

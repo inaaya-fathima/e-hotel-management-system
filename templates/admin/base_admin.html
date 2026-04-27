@@ -29,6 +29,9 @@
       <a href="{{ url_for('admin_rooms') }}" class="sidebar-nav-item">
         <i class="fas fa-door-open"></i> Rooms
       </a>
+      <a href="{{ url_for('admin_venues') }}" class="sidebar-nav-item">
+        <i class="fas fa-building"></i> Venues & Halls
+      </a>
       <a href="{{ url_for('admin_bookings') }}" class="sidebar-nav-item">
         <i class="fas fa-calendar-check"></i> Bookings
       </a>
@@ -49,6 +52,25 @@
       <a href="{{ url_for('admin_services') }}" class="sidebar-nav-item">
         <i class="fas fa-concierge-bell"></i> Services
       </a>
+      <a href="{{ url_for('admin_service_catalog') }}" class="sidebar-nav-item">
+        <i class="fas fa-tags"></i> Service Prices
+      </a>
+
+      <div class="sidebar-nav-section">Content & Communication</div>
+      <a href="{{ url_for('admin_offers') }}" class="sidebar-nav-item">
+        <i class="fas fa-percentage"></i> Offers
+      </a>
+      <a href="{{ url_for('admin_messages') }}" class="sidebar-nav-item" style="position:relative;">
+        <i class="fas fa-envelope"></i> Messages
+        {% set unread = namespace(count=0) %}
+        {% if session.get('admin_id') %}
+        <span id="msg-badge" style="background:var(--danger);color:#fff;font-size:.6rem;border-radius:99px;padding:2px 6px;margin-left:auto;">•</span>
+        {% endif %}
+      </a>
+      <a href="{{ url_for('admin_venue_enquiries') }}" class="sidebar-nav-item">
+        <i class="fas fa-calendar-alt"></i> Venue Enquiries
+      </a>
+
 
       <div class="sidebar-nav-section">Portals</div>
       <a href="{{ url_for('index') }}" class="sidebar-nav-item">

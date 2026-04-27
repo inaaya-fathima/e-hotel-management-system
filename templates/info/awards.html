@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Awards & Recognition — E-Hotel{% endblock %}
+{% block content %}
+
+<div style="position:relative;height:45vh;overflow:hidden;display:flex;align-items:flex-end;background:#0a0800;">
+  <img src="{{ url_for('static', filename='img/lobby.png') }}" alt="Awards"
+    style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.5;">
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(10,6,0,.95),transparent);"></div>
+  <div class="container" style="position:relative;z-index:1;padding-bottom:60px;">
+    <div class="section-tag" style="color:var(--accent2);"><i class="fas fa-trophy"></i>&nbsp; Global Recognition</div>
+    <h1 style="font-family:'Cormorant Garamond',serif;font-size:clamp(2.4rem,5vw,4rem);color:#fff;font-weight:700;">Awards &amp; <span style="color:var(--accent2);">Recognition</span></h1>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+    <div class="section-header centered reveal">
+      <h2>Honoured by the <span>World's Best</span></h2>
+      <div class="section-line centered"></div>
+      <p>Our commitment to excellence has earned us recognition from the world's most prestigious hospitality organisations.</p>
+    </div>
+    <div class="grid-3">
+      {% for year, award, body, desc in [
+        ('2024','Best Luxury Hotel Chain India','Condé Nast Traveller','Voted #1 luxury hotel chain by readers across South Asia'),
+        ('2023','Five Star Excellence Award','Forbes Travel Guide','Awarded five stars across all flagship properties'),
+        ('2023','World\'s Best Spa Hotel','Travel + Leisure','Recognised for our pioneering wellness programmes'),
+        ('2022','Most Sustainable Hotel Brand','Green Globe Awards','For our carbon-neutral operations and zero-waste programme'),
+        ('2022','Best Heritage Hotel','National Tourism Awards','For preserving India\'s cultural architecture in luxury form'),
+        ('2021','Best Hotel Brand India','Outlook Traveller Awards','Reader\'s choice for the fifth consecutive year')
+      ] %}
+      <div class="card tilt-card reveal delay-{{ loop.index % 3 + 1 }}" style="border-top:3px solid var(--accent);">
+        <div style="font-size:.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--accent-dark);font-weight:700;margin-bottom:8px;">{{ year }} · {{ body }}</div>
+        <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.25rem;margin-bottom:10px;">{{ award }}</h3>
+        <p style="font-size:.85rem;color:var(--text2);line-height:1.7;">{{ desc }}</p>
+        <div style="margin-top:14px;"><i class="fas fa-trophy" style="color:var(--accent);font-size:1.2rem;"></i></div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,349 +1,525 @@
 /**
- * ============================================================
- *  E-Hotel Management System — Global JavaScript
- *  File: static/js/main.js
- * ============================================================
- *
- *  This file runs on EVERY page of the website.
- *  It handles small interactive behaviors like:
- *    - Auto-dismissing flash alert messages
- *    - Mobile hamburger menu toggle
- *    - Wishlist heart button (AJAX toggle)
- *    - Star rating input hover effects
- *    - Scroll-in animations (cards fade in when visible)
- *    - Floating particles on the hero section
- *    - Confirming before delete actions
- *    - Modal popups (open/close)
- *
- *  It is loaded at the bottom of base.html, so it runs
- *  after all HTML elements are already on the page.
+ * E-Hotel — Premium Animation Engine
+ * GSAP + Lenis smooth scroll + Custom cursor + Parallax + Reveal
  */
 
-// Wait until the entire page has loaded before running JavaScript
+// ─────────────────────────────────────────────────────────────
+// 1. PREMIUM LOADING SCREEN
+// ─────────────────────────────────────────────────────────────
+(function () {
+  const screen = document.getElementById('loading-screen');
+  if (!screen) return;
+  const bar = document.getElementById('loadBar');
+  const pct = document.getElementById('loadPct');
+  let p = 0;
+
+  const t = setInterval(() => {
+    p = Math.min(92, p + Math.random() * 10 + 3);
+    if (bar)  bar.style.width = Math.floor(p) + '%';
+    if (pct)  pct.textContent  = Math.floor(p) + '%';
+  }, 50);
+
+  window.addEventListener('load', () => {
+    clearInterval(t);
+    if (bar) bar.style.width = '100%';
+    if (pct) pct.textContent  = '100%';
+
+    // Trigger door-open if present, else simple fade
+    setTimeout(() => {
+      screen.classList.add('doors-open');
+      setTimeout(() => {
+        screen.classList.add('fade-away');
+        setTimeout(() => { screen.style.display = 'none'; }, 700);
+      }, 1100);
+    }, 350);
+  });
+})();
+
+
+// ─────────────────────────────────────────────────────────────
+// 2. SCROLL PROGRESS BAR
+// ─────────────────────────────────────────────────────────────
+(function () {
+  const bar = document.getElementById('scroll-progress');
+  if (!bar) return;
+  window.addEventListener('scroll', () => {
+    const scrollTop = window.scrollY;
+    const docHeight  = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+    bar.style.width = pct + '%';
+  }, { passive: true });
+})();
+
+
+// ─────────────────────────────────────────────────────────────
+// 3. CUSTOM CURSOR
+// ─────────────────────────────────────────────────────────────
+(function () {
+  const dot  = document.getElementById('cursor-dot');
+  const ring = document.getElementById('cursor-ring');
+  if (!dot || !ring) return;
+
+  let mouseX = 0, mouseY = 0;
+  let ringX  = 0, ringY  = 0;
+
+  document.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX; mouseY = e.clientY;
+    dot.style.left  = mouseX + 'px';
+    dot.style.top   = mouseY + 'px';
+  }, { passive: true });
+
+  function animateRing() {
+    ringX += (mouseX - ringX) * 0.12;
+    ringY += (mouseY - ringY) * 0.12;
+    ring.style.left = ringX + 'px';
+    ring.style.top  = ringY + 'px';
+    requestAnimationFrame(animateRing);
+  }
+  requestAnimationFrame(animateRing);
+
+  // Hover state
+  const hoverTargets = 'a, button, .btn, .room-card, .img-card, .card, input, select, textarea, .wish-btn';
+  document.querySelectorAll(hoverTargets).forEach(el => {
+    el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+    el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+  });
+})();
+
+
+// ─────────────────────────────────────────────────────────────
+// 4. DOM READY
+// ─────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function () {
 
+  // ── 4a. Alert auto-dismiss ──────────────────────────────
+  document.querySelectorAll('.alert').forEach(alertBox => {
+    const closeBtn = alertBox.querySelector('.alert-close');
+    if (closeBtn) closeBtn.addEventListener('click', () => dismissAlert(alertBox));
+    setTimeout(() => dismissAlert(alertBox), 5000);
+  });
 
-    // ----------------------------------------------------------
-    // 1. Auto-dismiss flash alert messages
-    // ----------------------------------------------------------
-    // Flash messages (like "Booking successful!") disappear after 5 seconds.
-    document.querySelectorAll('.alert').forEach(function (alertBox) {
+  function dismissAlert(el) {
+    el.style.opacity   = '0';
+    el.style.transform = 'translateY(-10px)';
+    el.style.transition = 'all 0.3s ease';
+    setTimeout(() => el.remove(), 300);
+  }
 
-        // Close when user clicks the X button
-        var closeBtn = alertBox.querySelector('.alert-close');
-        if (closeBtn) {
-            closeBtn.addEventListener('click', function () {
-                dismissAlert(alertBox);
-            });
+  // ── 4b. Mobile nav ─────────────────────────────────────
+  const hamburgerBtn  = document.getElementById('hamburgerBtn');
+  const mobileNav     = document.getElementById('mobileNav');
+  const mobileOverlay = document.getElementById('mobileOverlay');
+  const mobileClose   = document.getElementById('mobileNavClose');
+
+  function openMobileNav()  { mobileNav?.classList.add('open');    mobileOverlay?.classList.add('open');    document.body.style.overflow = 'hidden'; }
+  function closeMobileNav() { mobileNav?.classList.remove('open'); mobileOverlay?.classList.remove('open'); document.body.style.overflow = ''; }
+
+  hamburgerBtn?.addEventListener('click', openMobileNav);
+  mobileClose?.addEventListener('click',  closeMobileNav);
+  mobileOverlay?.addEventListener('click', closeMobileNav);
+
+  // ── 4c. Admin sidebar ──────────────────────────────────
+  const sidebarToggle = document.getElementById('sidebarToggle');
+  const sidebar = document.querySelector('.sidebar');
+  if (sidebarToggle && sidebar) {
+    sidebarToggle.addEventListener('click', () => sidebar.classList.toggle('open'));
+  }
+
+  // ── 4d. Wishlist AJAX ──────────────────────────────────
+  document.querySelectorAll('.wish-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.preventDefault(); e.stopPropagation();
+      const roomId = btn.dataset.roomId;
+      fetch('/wishlist/toggle/' + roomId, { method: 'POST' })
+        .then(r => r.json())
+        .then(data => {
+          if (data.status === 'added') {
+            btn.classList.add('active');
+            btn.innerHTML = '<i class="fas fa-heart"></i>';
+            showToast('Added to wishlist!', 'success');
+          } else {
+            btn.classList.remove('active');
+            btn.innerHTML = '<i class="far fa-heart"></i>';
+            showToast('Removed from wishlist.', 'info');
+          }
+        })
+        .catch(() => showToast('Please login to use the wishlist.', 'error'));
+    });
+  });
+
+  // ── 4e. Star rating hover ──────────────────────────────
+  document.querySelectorAll('.star-input').forEach(starGroup => {
+    const labels = Array.from(starGroup.querySelectorAll('label')).reverse();
+    labels.forEach((label, i) => {
+      label.addEventListener('mouseenter', () => {
+        labels.forEach((l, j) => { l.style.color = j <= i ? 'var(--accent)' : 'var(--border)'; });
+      });
+    });
+    starGroup.addEventListener('mouseleave', () => updateStarDisplay(starGroup));
+    starGroup.querySelectorAll('input').forEach(input => {
+      input.addEventListener('change', () => updateStarDisplay(starGroup));
+    });
+  });
+
+  function updateStarDisplay(starGroup) {
+    const checked  = starGroup.querySelector('input:checked');
+    const labels   = Array.from(starGroup.querySelectorAll('label')).reverse();
+    const val      = checked ? parseInt(checked.value) : 0;
+    labels.forEach((l, i) => { l.style.color = i < val ? 'var(--accent)' : 'var(--border)'; });
+  }
+
+  // ── 4f. Confirm delete ─────────────────────────────────
+  document.querySelectorAll('[data-confirm]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      if (!confirm(btn.dataset.confirm || 'Are you sure?')) e.preventDefault();
+    });
+  });
+
+  // ── 4g. Modal system ───────────────────────────────────
+  document.querySelectorAll('[data-modal]').forEach(trigger => {
+    trigger.addEventListener('click', () => {
+      const modal = document.getElementById(trigger.dataset.modal);
+      if (modal) { modal.classList.add('open'); }
+    });
+  });
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
+  });
+  document.querySelectorAll('.modal-close').forEach(btn => {
+    btn.addEventListener('click', () => btn.closest('.modal-overlay')?.classList.remove('open'));
+  });
+
+  // ── 4h. Navbar shrink on scroll ────────────────────────
+  const navbar = document.getElementById('mainNavbar');
+  if (navbar) {
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 60);
+    }, { passive: true });
+  }
+
+  // ── 4i. Navbar active link ─────────────────────────────
+  const currentPath = window.location.pathname;
+  document.querySelectorAll('.navbar-nav > li > a, .sidebar-nav-item').forEach(link => {
+    const href = link.getAttribute('href');
+    if (href && (href === currentPath || (href !== '/' && currentPath.startsWith(href)))) {
+      link.classList.add('active');
+    }
+  });
+
+  // ── 4j. Hero particles ─────────────────────────────────
+  const heroParticles = document.querySelector('.particles');
+  if (heroParticles) createParticles(heroParticles);
+
+  // ── 4k. Draggable horizontal scroll ────────────────────
+  document.querySelectorAll('.h-scroll-track').forEach(track => {
+    let isDown = false, startX = 0, scrollLeft = 0;
+    track.addEventListener('mousedown', e => {
+      isDown = true; track.style.cursor = 'grabbing';
+      startX = e.pageX - track.offsetLeft;
+      scrollLeft = track.scrollLeft;
+    });
+    track.addEventListener('mouseleave', () => { isDown = false; track.style.cursor = 'grab'; });
+    track.addEventListener('mouseup',    () => { isDown = false; track.style.cursor = 'grab'; });
+    track.addEventListener('mousemove',  e => {
+      if (!isDown) return;
+      e.preventDefault();
+      const x   = e.pageX - track.offsetLeft;
+      const walk = (x - startX) * 1.8;
+      track.scrollLeft = scrollLeft - walk;
+    });
+  });
+
+  // ── 4l. Intersection Observer for .reveal classes ──────
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in-view');
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale').forEach(el => {
+    revealObserver.observe(el);
+  });
+
+  // ── 4m. Count-up animation ─────────────────────────────
+  const countObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && !entry.target.dataset.counted) {
+        entry.target.dataset.counted = 'true';
+        const target = parseInt(entry.target.dataset.target || entry.target.textContent);
+        const suffix = entry.target.dataset.suffix || '';
+        animateCount(entry.target, target, suffix);
+      }
+    });
+  }, { threshold: 0.5 });
+
+  document.querySelectorAll('.count-up').forEach(el => countObserver.observe(el));
+
+  function animateCount(el, target, suffix) {
+    const duration = 1800;
+    const start = performance.now();
+    function step(now) {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const ease = 1 - Math.pow(1 - progress, 4);
+      el.textContent = Math.round(ease * target) + suffix;
+      if (progress < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  // ── 4n. Tilt effect on cards ───────────────────────────
+  document.querySelectorAll('.tilt-card').forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left - rect.width / 2;
+      const y = e.clientY - rect.top  - rect.height / 2;
+      const tiltX = (y / rect.height) * 10;
+      const tiltY = -(x / rect.width) * 10;
+      card.style.transform = `perspective(800px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale(1.02)`;
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = '';
+      card.style.transition = 'transform 0.5s cubic-bezier(.25,.46,.45,.94)';
+    });
+  });
+
+
+  // ─────────────────────────────────────────────────────
+  // 5. GSAP + LENIS SETUP
+  // ─────────────────────────────────────────────────────
+  if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+    gsap.registerPlugin(ScrollTrigger);
+    if (typeof ScrollToPlugin !== 'undefined') gsap.registerPlugin(ScrollToPlugin);
+
+    // ── Lenis smooth scroll ──────────────────────────
+    if (typeof Lenis !== 'undefined') {
+      const lenis = new Lenis({
+        duration: 1.4,
+        easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        smooth: true,
+        smoothTouch: false,
+        touchMultiplier: 2,
+      });
+      function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+      requestAnimationFrame(raf);
+      lenis.on('scroll', ScrollTrigger.update);
+      gsap.ticker.add(time => lenis.raf(time * 1000));
+      gsap.ticker.lagSmoothing(0, 0);
+
+      // Smooth scroll for anchor links
+      document.querySelectorAll('a[href^="#"]').forEach(a => {
+        a.addEventListener('click', e => {
+          const target = document.querySelector(a.getAttribute('href'));
+          if (target) { e.preventDefault(); lenis.scrollTo(target, { offset: -80, duration: 1.6 }); }
+        });
+      });
+    }
+
+    // ── Parallax hero bg ─────────────────────────────
+    const heroBg = document.querySelector('.hero-bg');
+    if (heroBg) {
+      gsap.to(heroBg, {
+        yPercent: 30,
+        ease: 'none',
+        scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 1.5 }
+      });
+    }
+
+    // ── Parallax + rotate images on scroll ───────────
+    gsap.utils.toArray('.parallax-rotate').forEach(wrapper => {
+      const img = wrapper.querySelector('img');
+      if (!img) return;
+      gsap.fromTo(img,
+        { rotate: -4, scale: 1.1 },
+        {
+          rotate: 4, scale: 1.05,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: wrapper,
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: 2
+          }
         }
-
-        // Auto-close after 5000 milliseconds (5 seconds)
-        setTimeout(function () {
-            dismissAlert(alertBox);
-        }, 5000);
+      );
     });
 
-    /**
-     * Smoothly fades out and removes an alert element.
-     * @param {HTMLElement} el - The alert element to dismiss
-     */
-    function dismissAlert(el) {
-        el.style.opacity    = '0';
-        el.style.transform  = 'translateY(-10px)';
-        el.style.transition = 'all 0.3s ease';
-        // Remove from page after the animation finishes
-        setTimeout(function () { el.remove(); }, 300);
-    }
-
-
-    // ----------------------------------------------------------
-    // 2. Mobile hamburger menu (navbar)
-    // ----------------------------------------------------------
-    var hamburgerBtn = document.querySelector('.hamburger');
-    var navMenu      = document.querySelector('.navbar-nav');
-
-    if (hamburgerBtn && navMenu) {
-        hamburgerBtn.addEventListener('click', function () {
-            // Toggle the nav menu open/closed on mobile
-            var isOpen = navMenu.style.display === 'flex';
-            navMenu.style.display      = isOpen ? 'none' : 'flex';
-            navMenu.style.flexDirection = 'column';
-            navMenu.style.position      = 'absolute';
-            navMenu.style.top           = '70px';
-            navMenu.style.left          = '0';
-            navMenu.style.right         = '0';
-            navMenu.style.background    = 'var(--bg2)';
-            navMenu.style.padding       = '16px';
-            navMenu.style.borderBottom  = '1px solid var(--border)';
-        });
-    }
-
-
-    // ----------------------------------------------------------
-    // 3. Admin sidebar mobile toggle
-    // ----------------------------------------------------------
-    var sidebarToggle = document.getElementById('sidebarToggle');
-    var sidebar       = document.querySelector('.sidebar');
-
-    if (sidebarToggle && sidebar) {
-        sidebarToggle.addEventListener('click', function () {
-            sidebar.classList.toggle('open');
-        });
-    }
-
-
-    // ----------------------------------------------------------
-    // 4. Wishlist heart button (AJAX)
-    // ----------------------------------------------------------
-    // When a user clicks the heart button on a room card,
-    // we send a request to the server to add/remove the wishlist entry.
-    // The page does NOT reload — we update the button instantly.
-    document.querySelectorAll('.wish-btn').forEach(function (btn) {
-        btn.addEventListener('click', function (event) {
-            event.preventDefault();
-            event.stopPropagation(); // Don't trigger parent click events
-
-            var roomId = btn.dataset.roomId; // Room ID from data-room-id="..."
-
-            fetch('/wishlist/toggle/' + roomId, { method: 'POST' })
-                .then(function (response) { return response.json(); })
-                .then(function (data) {
-                    if (data.status === 'added') {
-                        // Show filled heart
-                        btn.classList.add('active');
-                        btn.innerHTML = '<i class="fas fa-heart"></i>';
-                        showToast('Added to wishlist!', 'success');
-                    } else {
-                        // Show empty heart
-                        btn.classList.remove('active');
-                        btn.innerHTML = '<i class="far fa-heart"></i>';
-                        showToast('Removed from wishlist.', 'info');
-                    }
-                })
-                .catch(function () {
-                    showToast('Please login to use the wishlist.', 'error');
-                });
-        });
-    });
-
-
-    // ----------------------------------------------------------
-    // 5. Star rating hover effects (review form)
-    // ----------------------------------------------------------
-    document.querySelectorAll('.star-input').forEach(function (starGroup) {
-        // Get labels in reverse order (star 5 → star 1)
-        var labels = Array.from(starGroup.querySelectorAll('label')).reverse();
-
-        labels.forEach(function (label, index) {
-            // Highlight stars on hover
-            label.addEventListener('mouseenter', function () {
-                labels.forEach(function (l, j) {
-                    l.style.color = j <= index ? 'var(--warning)' : 'var(--border)';
-                });
-            });
-        });
-
-        // Reset to the selected star when mouse leaves
-        starGroup.addEventListener('mouseleave', function () {
-            updateStarDisplay(starGroup);
-        });
-
-        // Update display when a star is selected
-        starGroup.querySelectorAll('input').forEach(function (input) {
-            input.addEventListener('change', function () {
-                updateStarDisplay(starGroup);
-            });
-        });
-    });
-
-    /** Updates star colors based on currently selected rating */
-    function updateStarDisplay(starGroup) {
-        var checkedInput = starGroup.querySelector('input:checked');
-        var labels       = Array.from(starGroup.querySelectorAll('label')).reverse();
-        var selectedVal  = checkedInput ? parseInt(checkedInput.value) : 0;
-
-        labels.forEach(function (label, index) {
-            label.style.color = index < selectedVal ? 'var(--warning)' : 'var(--border)';
-        });
-    }
-
-
-    // ----------------------------------------------------------
-    // 6. Scroll-in animations (cards fade up when scrolled into view)
-    // ----------------------------------------------------------
-    var animObserver = new IntersectionObserver(function (entries) {
-        entries.forEach(function (entry) {
-            if (entry.isIntersecting) {
-                // When element enters the viewport, make it visible
-                entry.target.style.opacity   = '1';
-                entry.target.style.transform = 'translateY(0)';
-            }
-        });
-    }, { threshold: 0.1 }); // Trigger when 10% of the element is visible
-
-    // Apply animation to room cards and stat cards
-    document.querySelectorAll('.room-card, .stat-card, .card').forEach(function (el) {
-        el.style.opacity    = '0';
-        el.style.transform  = 'translateY(20px)';
-        el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-        animObserver.observe(el);
-    });
-
-
-    // ----------------------------------------------------------
-    // 7. Hero section floating particles
-    // ----------------------------------------------------------
-    var particlesContainer = document.querySelector('.particles');
-    if (particlesContainer) {
-        createParticles(particlesContainer);
-    }
-
-
-    // ----------------------------------------------------------
-    // 8. Highlight the active navigation link
-    // ----------------------------------------------------------
-    var currentPath = window.location.pathname;
-    document.querySelectorAll('.navbar-nav a, .sidebar-nav-item').forEach(function (link) {
-        if (link.getAttribute('href') === currentPath) {
-            link.classList.add('active');
+    // ── Parallax simple images ────────────────────────
+    gsap.utils.toArray('.img-card img, .room-card-img img').forEach(img => {
+      gsap.to(img, {
+        yPercent: 12,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: img.parentElement,
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: 1.2
         }
+      });
     });
 
+    // ── Stagger card reveals ──────────────────────────
+    gsap.utils.toArray('.grid-3, .grid-4, .rooms-grid').forEach(grid => {
+      const cards = grid.querySelectorAll('.card, .room-card, .img-card, .stat-card');
+      if (!cards.length) return;
+      gsap.from(cards, {
+        y: 70, opacity: 0, duration: 0.9, stagger: 0.15,
+        ease: 'power3.out',
+        scrollTrigger: { trigger: grid, start: 'top 88%', toggleActions: 'play none none reverse' }
+      });
+    });
 
-    // ----------------------------------------------------------
-    // 9. Confirm before deleting (data-confirm attribute)
-    // ----------------------------------------------------------
-    // Add data-confirm="Are you sure?" to any button/link to get a confirmation popup
-    document.querySelectorAll('[data-confirm]').forEach(function (btn) {
-        btn.addEventListener('click', function (event) {
-            var message = btn.dataset.confirm || 'Are you sure?';
-            if (!confirm(message)) {
-                event.preventDefault(); // Cancel the action if user clicks "Cancel"
-            }
+    // ── Horizontal slide for grid-2 ───────────────────
+    gsap.utils.toArray('.grid-2').forEach(grid => {
+      const children = [...grid.children];
+      if (children.length < 2) return;
+      gsap.from(children[0], {
+        x: -60, opacity: 0, duration: 1, ease: 'power3.out',
+        scrollTrigger: { trigger: grid, start: 'top 85%', toggleActions: 'play none none reverse' }
+      });
+      gsap.from(children[1], {
+        x: 60, opacity: 0, duration: 1, delay: 0.1, ease: 'power3.out',
+        scrollTrigger: { trigger: grid, start: 'top 85%', toggleActions: 'play none none reverse' }
+      });
+    });
+
+    // ── Section header reveals ────────────────────────
+    gsap.utils.toArray('.section-header').forEach(header => {
+      gsap.from(header, {
+        y: 50, opacity: 0, duration: 1, ease: 'power3.out',
+        scrollTrigger: { trigger: header, start: 'top 88%', toggleActions: 'play none none reverse' }
+      });
+    });
+
+    // ── Stats bar counters ────────────────────────────
+    gsap.utils.toArray('.stat-card').forEach((card, i) => {
+      gsap.from(card, {
+        y: 40, opacity: 0, duration: 0.7, delay: i * 0.1, ease: 'power2.out',
+        scrollTrigger: { trigger: card, start: 'top 92%', toggleActions: 'play none none reverse' }
+      });
+    });
+
+    // ── Footer reveal ─────────────────────────────────
+    const footer = document.querySelector('.footer');
+    if (footer) {
+      gsap.from('.footer-brand, .footer-links', {
+        y: 40, opacity: 0, duration: 0.8, stagger: 0.12, ease: 'power2.out',
+        scrollTrigger: { trigger: footer, start: 'top 95%', toggleActions: 'play none none reverse' }
+      });
+    }
+
+    // ── SplitType headline animation (fast & classy) ──
+    if (typeof SplitType !== 'undefined') {
+      // Hero title — fast chars flying in from below
+      document.querySelectorAll('.hero h1').forEach(el => {
+        const split = new SplitType(el, { types: 'chars' });
+        gsap.from(split.chars, {
+          y: '110%',
+          opacity: 0,
+          rotateX: -80,
+          duration: 0.55,
+          stagger: 0.018,
+          ease: 'back.out(2)',
+          delay: 0.5,
         });
-    });
+      });
 
-
-    // ----------------------------------------------------------
-    // 10. Modal system (open/close popups)
-    // ----------------------------------------------------------
-
-    // Open modal when clicking a trigger element with data-modal="modal-id"
-    document.querySelectorAll('[data-modal]').forEach(function (trigger) {
-        trigger.addEventListener('click', function () {
-            var modalId = trigger.dataset.modal;
-            var modal   = document.getElementById(modalId);
-            if (modal) modal.classList.add('open');
+      // Hero sub text — word by word, crisp
+      document.querySelectorAll('.hero p, .hero .hero-tag').forEach(el => {
+        const split = new SplitType(el, { types: 'words' });
+        gsap.from(split.words, {
+          y: 30, opacity: 0, duration: 0.5,
+          stagger: 0.04, ease: 'power2.out', delay: 0.9,
         });
-    });
+      });
 
-    // Close modal when clicking outside the modal box
-    document.querySelectorAll('.modal-overlay').forEach(function (overlay) {
-        overlay.addEventListener('click', function (event) {
-            if (event.target === overlay) {
-                overlay.classList.remove('open');
-            }
+      // Section headings — chars slide + fade
+      document.querySelectorAll('.section-header h2').forEach(el => {
+        const split = new SplitType(el, { types: 'chars' });
+        gsap.from(split.chars, {
+          y: '100%',
+          opacity: 0,
+          duration: 0.4,
+          stagger: 0.015,
+          ease: 'power4.out',
+          scrollTrigger: {
+            trigger: el,
+            start: 'top 88%',
+            toggleActions: 'play none none reverse'
+          }
         });
+      });
+    }
+
+    // ── Marquee infinite scroll ───────────────────────
+    const marqueeTrack = document.querySelector('.marquee-track');
+    if (marqueeTrack) {
+      // Clone for seamless loop
+      marqueeTrack.innerHTML += marqueeTrack.innerHTML;
+    }
+
+    // ── CTA banner parallax text ──────────────────────
+    const ctaBanner = document.querySelector('[data-cta-banner]');
+    if (ctaBanner) {
+      gsap.from(ctaBanner.querySelectorAll('h2, p, a, .btn'), {
+        y: 50, opacity: 0, duration: 0.8, stagger: 0.15, ease: 'power3.out',
+        scrollTrigger: { trigger: ctaBanner, start: 'top 80%', toggleActions: 'play none none reverse' }
+      });
+    }
+
+  } else {
+    // Fallback
+    document.querySelectorAll('.room-card, .stat-card, .card, .img-card').forEach(el => {
+      el.style.opacity = '1';
     });
+  }
 
-    // Close modal when clicking the X (close) button
-    document.querySelectorAll('.modal-close').forEach(function (closeBtn) {
-        closeBtn.addEventListener('click', function () {
-            closeBtn.closest('.modal-overlay').classList.remove('open');
-        });
-    });
-
-}); // END DOMContentLoaded
+});  // END DOMContentLoaded
 
 
-// ============================================================
-// UTILITY FUNCTIONS (available globally on every page)
-// ============================================================
-
-/**
- * Shows a small toast notification in the bottom-right corner.
- *
- * @param {string} message - The text to show
- * @param {string} type - 'success', 'error', 'info', or 'warning'
- *
- * Example:
- *   showToast('Room added to wishlist!', 'success');
- */
+// ─────────────────────────────────────────────────────────────
+// 6. UTILITY FUNCTIONS
+// ─────────────────────────────────────────────────────────────
 function showToast(message, type) {
-    type = type || 'info';
-
-    // Create the toast container if it doesn't exist yet
-    var container = document.querySelector('.toast-container');
-    if (!container) {
-        container = document.createElement('div');
-        container.className = 'toast-container';
-        document.body.appendChild(container);
-    }
-
-    // Icon based on type
-    var icons = {
-        success: 'fa-check-circle',
-        error:   'fa-times-circle',
-        info:    'fa-info-circle',
-        warning: 'fa-exclamation-circle'
-    };
-
-    // Create the toast element
-    var toast = document.createElement('div');
-    toast.className = 'toast ' + type;
-    toast.innerHTML = '<i class="fas ' + (icons[type] || icons.info) + '"></i> ' + message;
-    container.appendChild(toast);
-
-    // Fade out and remove after 3.5 seconds
-    setTimeout(function () {
-        toast.style.opacity    = '0';
-        toast.style.transform  = 'translateX(20px)';
-        toast.style.transition = 'all 0.3s ease';
-        setTimeout(function () { toast.remove(); }, 300);
-    }, 3500);
+  type = type || 'info';
+  let container = document.querySelector('.toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.className = 'toast-container';
+    document.body.appendChild(container);
+  }
+  const icons = { success: 'fa-check-circle', error: 'fa-times-circle', info: 'fa-info-circle', warning: 'fa-exclamation-circle' };
+  const toast = document.createElement('div');
+  toast.className = 'toast ' + type;
+  toast.innerHTML = `<i class="fas ${icons[type] || icons.info}"></i> ${message}`;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.opacity   = '0';
+    toast.style.transform = 'translateX(20px)';
+    toast.style.transition = 'all 0.3s ease';
+    setTimeout(() => toast.remove(), 300);
+  }, 3500);
 }
 
-
-/**
- * Creates floating particle dots for the hero section background.
- * @param {HTMLElement} container - The element to put particles in
- */
 function createParticles(container) {
-    for (var i = 0; i < 30; i++) {
-        var particle = document.createElement('div');
-        particle.className          = 'particle';
-        particle.style.left             = (Math.random() * 100) + '%';
-        particle.style.animationDuration = (Math.random() * 10 + 8) + 's';
-        particle.style.animationDelay    = (Math.random() * 8) + 's';
-        var size = (Math.random() * 3 + 1) + 'px';
-        particle.style.width  = size;
-        particle.style.height = size;
-        container.appendChild(particle);
-    }
+  for (let i = 0; i < 24; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = (Math.random() * 100) + '%';
+    p.style.animationDuration = (Math.random() * 14 + 8) + 's';
+    p.style.animationDelay    = (Math.random() * 10) + 's';
+    const sz = (Math.random() * 3 + 1) + 'px';
+    p.style.width = sz; p.style.height = sz;
+    container.appendChild(p);
+  }
 }
 
-
-/**
- * Formats a number as Indian Rupee currency.
- * @param {number} amount - The number to format
- * @returns {string} e.g. '₹2,500'
- */
 function formatCurrency(amount) {
-    return '₹' + parseFloat(amount).toLocaleString('en-IN');
+  return '₹' + parseFloat(amount).toLocaleString('en-IN');
 }
 
-
-/**
- * Shows a confirmation popup and submits a form if the user confirms.
- *
- * @param {string} formId   - The ID of the form element to submit
- * @param {string} message  - The confirmation message to show
- *
- * Example (in HTML):
- *   <button onclick="confirmAndSubmit('deleteForm', 'Delete this room?')">Delete</button>
- */
 function confirmAndSubmit(formId, message) {
-    if (confirm(message)) {
-        document.getElementById(formId).submit();
-    }
+  if (confirm(message)) document.getElementById(formId).submit();
 }
