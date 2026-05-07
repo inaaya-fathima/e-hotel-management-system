@@ -6,7 +6,6 @@ File: routes/customer_routes.py
 import datetime
 import sqlite3
 import random
-import time
 from flask import render_template, request, redirect, url_for, session, flash, jsonify
 from utils.db import query_db, hash_password
 from utils.auth import login_required
@@ -41,14 +40,18 @@ def register_customer_routes(app):
     # ----------------------------------------------------------
     @app.route('/signup', methods=['GET', 'POST'])
     def customer_signup():
+        """Show signup form (GET) or process registration (POST)."""
         if 'user_id' in session:
             return redirect(url_for('customer_dashboard'))
 
         if request.method == 'POST':
-            otp_verified = request.form.get('otp_verified', '0')
-            if otp_verified != '1':
-                flash('Please complete OTP verification first.', 'warning')
-                return render_template('auth/signup.html')
+            # --- Captcha verification ---
+            user_captcha = request.form.get('captcha_answer', '').strip()
+            correct      = str(session.get('captcha_answer', ''))
+            if not user_captcha or user_captcha != correct:
+                flash('Incorrect captcha answer. Please try again.', 'danger')
+                return redirect(url_for('customer_signup'))
+            session.pop('captcha_answer', None)
 
             name     = request.form.get('name', '').strip()
             email    = request.form.get('email', '').strip()
@@ -57,7 +60,7 @@ def register_customer_routes(app):
 
             if not name or not email or not password:
                 flash('Please fill in all required fields.', 'danger')
-                return render_template('auth/signup.html')
+                return redirect(url_for('customer_signup'))
 
             try:
                 query_db(
@@ -68,61 +71,25 @@ def register_customer_routes(app):
                 return redirect(url_for('customer_login'))
             except sqlite3.IntegrityError:
                 flash('That email address is already registered.', 'danger')
+                return redirect(url_for('customer_signup'))
 
-        return render_template('auth/signup.html')
+        # GET: generate a fresh captcha challenge
+        ops = ['+', '-', '×']
+        op  = random.choice(ops)
+        a   = random.randint(2, 15)
+        b   = random.randint(1, 10)
+        if op == '+':
+            answer = a + b
+        elif op == '-':
+            a, b   = max(a, b), min(a, b)
+            answer = a - b
+        else:
+            a, b   = random.randint(2, 9), random.randint(2, 9)
+            answer = a * b
 
-
-    # ----------------------------------------------------------
-    # OTP Send & Verify
-    # ----------------------------------------------------------
-    @app.route('/send-otp', methods=['POST'])
-    def send_otp():
-        data    = request.get_json()
-        email   = data.get('email', '').strip()
-        phone   = data.get('phone', '').strip()
-        channel = data.get('channel', 'email')
-        name    = data.get('name', 'Guest')
-
-        if not email:
-            return jsonify({'success': False, 'message': 'Email is required.'})
-
-        otp = str(random.randint(100000, 999999))
-        session['pending_otp']       = otp
-        session['pending_otp_email'] = email
-        session['pending_otp_ts']    = time.time()
-
-        print(f"\n{'='*50}")
-        print(f"  OTP for {name} ({email})")
-        print(f"  OTP CODE: {otp}")
-        print(f"{'='*50}\n")
-
-        return jsonify({
-            'success': True,
-            'message': f'OTP sent to {channel}',
-            'otp_hint': f'[DEV] OTP is {otp}'
-        })
-
-
-    @app.route('/verify-otp', methods=['POST'])
-    def verify_otp():
-        data        = request.get_json()
-        entered_otp = data.get('otp', '').strip()
-        email       = data.get('email', '').strip()
-
-        saved_otp   = session.get('pending_otp')
-        saved_email = session.get('pending_otp_email')
-        saved_ts    = session.get('pending_otp_ts', 0)
-
-        if time.time() - saved_ts > 600:
-            return jsonify({'success': False, 'message': 'OTP has expired. Please request a new one.'})
-
-        if saved_otp and saved_email == email and entered_otp == saved_otp:
-            session.pop('pending_otp', None)
-            session.pop('pending_otp_email', None)
-            session.pop('pending_otp_ts', None)
-            return jsonify({'success': True})
-
-        return jsonify({'success': False, 'message': 'Invalid OTP.'})
+        session['captcha_answer'] = str(answer)
+        captcha_question = f"{a} {op} {b}"
+        return render_template('auth/signup.html', captcha_question=captcha_question)
 
 
     # ----------------------------------------------------------

@@ -6,6 +6,66 @@
   <title>Create Account — E-Hotel</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    /* ── Captcha widget ───────────────────────────────────────── */
+    .captcha-box {
+      background: rgba(201,168,76,.06);
+      border: 1px solid rgba(201,168,76,.28);
+      border-radius: 12px;
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .captcha-shield {
+      width: 42px; height: 42px;
+      background: rgba(201,168,76,.12);
+      border: 1px solid var(--accent);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; color: var(--accent);
+      flex-shrink: 0;
+    }
+    .captcha-question {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: .04em;
+      flex-shrink: 0;
+      min-width: 90px;
+    }
+    .captcha-equals {
+      font-size: 1.25rem;
+      color: var(--text2);
+      flex-shrink: 0;
+    }
+    .captcha-input {
+      width: 80px;
+      text-align: center;
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: .06em;
+    }
+    .captcha-refresh {
+      background: none; border: none; cursor: pointer;
+      color: var(--text2); font-size: .85rem;
+      margin-left: auto;
+      display: flex; align-items: center; gap: 5px;
+      transition: color .2s;
+      font-family: 'Jost', sans-serif;
+    }
+    .captcha-refresh:hover { color: var(--accent); }
+
+    .captcha-badge {
+      display: flex; align-items: center; gap: 6px;
+      font-size: .72rem; color: var(--text2);
+      margin-top: 8px;
+      letter-spacing: .03em;
+    }
+    .captcha-badge i { color: var(--accent); font-size: .78rem; }
+  </style>
 </head>
 <body>
 <div class="auth-page">
@@ -21,102 +81,90 @@
     <div class="alert alert-{{ cat }}"><i class="fas fa-info-circle"></i> {{ msg }}</div>
     {% endfor %}{% endif %}{% endwith %}
 
-    <!-- Step 1: Registration Form -->
-    <div id="stepRegister">
-      <form id="registerForm" onsubmit="sendOTP(event)">
-        <div class="form-group">
-          <label class="form-label"><i class="fas fa-user" style="color:var(--accent);margin-right:6px;"></i>Full Name</label>
-          <input type="text" class="form-control" id="regName" placeholder="John Doe" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label"><i class="fas fa-envelope" style="color:var(--accent);margin-right:6px;"></i>Email Address</label>
-          <input type="email" class="form-control" id="regEmail" placeholder="you@email.com" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label"><i class="fas fa-phone" style="color:var(--accent);margin-right:6px;"></i>Phone Number</label>
-          <input type="tel" class="form-control" id="regPhone" placeholder="9876543210" pattern="[0-9]{10}">
-        </div>
-        <div class="form-group">
-          <label class="form-label"><i class="fas fa-lock" style="color:var(--accent);margin-right:6px;"></i>Password</label>
-          <div style="position:relative;">
-            <input type="password" class="form-control" id="regPassword" placeholder="Min 6 characters" minlength="6" required style="padding-right:44px;">
-            <button type="button" onclick="togglePwd('regPassword',this)" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text2);font-size:.9rem;" tabindex="-1">
-              <i class="fas fa-eye"></i>
-            </button>
-          </div>
-        </div>
-
-        <!-- OTP Channel -->
-        <div class="form-group">
-          <label class="form-label">Verify via</label>
-          <div class="otp-channel-select">
-            <button type="button" class="otp-channel-btn selected" id="channelEmail" onclick="selectChannel('email')">
-              <i class="fas fa-envelope"></i>
-              <span>Email</span>
-            </button>
-            <button type="button" class="otp-channel-btn" id="channelSms" onclick="selectChannel('sms')">
-              <i class="fas fa-mobile-alt"></i>
-              <span>Mobile SMS</span>
-            </button>
-          </div>
-          <input type="hidden" id="otpChannel" value="email">
-        </div>
-
-        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:14px;" id="sendOtpBtn">
-          <i class="fas fa-shield-alt"></i> Send OTP &amp; Verify
-        </button>
-      </form>
-    </div>
-
-    <!-- Step 2: OTP Verification -->
-    <div id="stepOTP" style="display:none;">
-      <div style="text-align:center;margin-bottom:24px;">
-        <div style="width:64px;height:64px;background:rgba(201,168,76,.1);border:1px solid var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:1.8rem;color:var(--accent);">
-          <i class="fas fa-shield-alt"></i>
-        </div>
-        <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;margin-bottom:6px;">Verify Your Identity</h3>
-        <p id="otpSentMsg" style="font-size:.85rem;color:var(--text2);">Enter the 6-digit code sent to your email</p>
+    <form id="signupForm" method="post" action="{{ url_for('customer_signup') }}" onsubmit="return validateCaptcha()">
+      <!-- Full Name -->
+      <div class="form-group">
+        <label class="form-label">
+          <i class="fas fa-user" style="color:var(--accent);margin-right:6px;"></i>Full Name
+        </label>
+        <input type="text" class="form-control" name="name" id="regName"
+               placeholder="John Doe" required autocomplete="name">
       </div>
 
-      <div class="otp-input-row">
-        <input class="otp-digit" type="text" maxlength="1" id="otp0">
-        <input class="otp-digit" type="text" maxlength="1" id="otp1">
-        <input class="otp-digit" type="text" maxlength="1" id="otp2">
-        <input class="otp-digit" type="text" maxlength="1" id="otp3">
-        <input class="otp-digit" type="text" maxlength="1" id="otp4">
-        <input class="otp-digit" type="text" maxlength="1" id="otp5">
+      <!-- Email -->
+      <div class="form-group">
+        <label class="form-label">
+          <i class="fas fa-envelope" style="color:var(--accent);margin-right:6px;"></i>Email Address
+        </label>
+        <input type="email" class="form-control" name="email" id="regEmail"
+               placeholder="you@email.com" required autocomplete="email">
       </div>
 
-      <div id="otpError" style="color:var(--danger);font-size:.83rem;text-align:center;margin-bottom:12px;display:none;">
-        <i class="fas fa-times-circle"></i> Invalid OTP. Please try again.
+      <!-- Phone -->
+      <div class="form-group">
+        <label class="form-label">
+          <i class="fas fa-phone" style="color:var(--accent);margin-right:6px;"></i>Phone Number
+        </label>
+        <input type="tel" class="form-control" name="phone" id="regPhone"
+               placeholder="9876543210" pattern="[0-9]{10}" autocomplete="tel">
       </div>
 
-      <button onclick="verifyOTP()" class="btn btn-primary" style="width:100%;justify-content:center;padding:14px;" id="verifyBtn">
-        <i class="fas fa-check-circle"></i> Verify &amp; Create Account
+      <!-- Password -->
+      <div class="form-group">
+        <label class="form-label">
+          <i class="fas fa-lock" style="color:var(--accent);margin-right:6px;"></i>Password
+        </label>
+        <div style="position:relative;">
+          <input type="password" class="form-control" name="password" id="regPassword"
+                 placeholder="Min 6 characters" minlength="6" required
+                 autocomplete="new-password" style="padding-right:44px;">
+          <button type="button" onclick="togglePwd('regPassword',this)"
+                  style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text2);font-size:.9rem;"
+                  tabindex="-1">
+            <i class="fas fa-eye"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- ── Captcha ────────────────────────────────────────── -->
+      <div class="form-group">
+        <label class="form-label">
+          <i class="fas fa-shield-halved" style="color:var(--accent);margin-right:6px;"></i>Human Verification
+        </label>
+
+        <div class="captcha-box">
+          <div class="captcha-shield"><i class="fas fa-robot"></i></div>
+          <span class="captcha-question" id="captchaDisplay">{{ captcha_question }}</span>
+          <span class="captcha-equals">=</span>
+          <input type="number" class="form-control captcha-input"
+                 name="captcha_answer" id="captchaAnswer"
+                 placeholder="?" required autocomplete="off" min="0">
+          <a href="{{ url_for('customer_signup') }}" class="captcha-refresh" title="Get a new challenge">
+            <i class="fas fa-rotate-right"></i> Refresh
+          </a>
+        </div>
+
+        <div class="captcha-badge">
+          <i class="fas fa-lock"></i>
+          Verified server-side &mdash; your answer is never stored publicly
+        </div>
+
+        <div id="captchaError"
+             style="color:var(--danger);font-size:.83rem;margin-top:8px;display:none;">
+          <i class="fas fa-times-circle"></i> Please solve the math problem to continue.
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <button type="submit" class="btn btn-primary"
+              style="width:100%;justify-content:center;padding:14px;" id="submitBtn">
+        <i class="fas fa-user-plus"></i> Create Account
       </button>
-
-      <div style="text-align:center;margin-top:16px;">
-        <span style="font-size:.82rem;color:var(--text2);">Didn't receive it?</span>
-        <button onclick="resendOTP()" style="background:none;border:none;cursor:pointer;color:var(--accent-dark);font-size:.82rem;font-weight:600;margin-left:6px;font-family:'Jost',sans-serif;">Resend OTP</button>
-      </div>
-      <div style="text-align:center;margin-top:10px;">
-        <button onclick="goBack()" style="background:none;border:none;cursor:pointer;color:var(--text2);font-size:.8rem;font-family:'Jost',sans-serif;">
-          <i class="fas fa-arrow-left"></i> Change Details
-        </button>
-      </div>
-    </div>
-
-    <!-- Hidden form for final submission -->
-    <form id="finalForm" method="post" action="{{ url_for('customer_signup') }}" style="display:none;">
-      <input type="hidden" name="name" id="hName">
-      <input type="hidden" name="email" id="hEmail">
-      <input type="hidden" name="phone" id="hPhone">
-      <input type="hidden" name="password" id="hPassword">
-      <input type="hidden" name="otp_verified" value="1">
     </form>
 
     <div class="auth-footer" style="margin-top:20px;">
-      Already have an account? <a href="{{ url_for('customer_login') }}" style="color:var(--accent-dark);font-weight:600;">Login</a>
+      Already have an account?
+      <a href="{{ url_for('customer_login') }}" style="color:var(--accent-dark);font-weight:600;">Login</a>
     </div>
     <div class="auth-footer mt-2">
       <a href="{{ url_for('index') }}" style="color:var(--text2);font-size:.82rem;">
@@ -127,139 +175,47 @@
 </div>
 
 <script>
-var selectedChannel = 'email';
-var generatedOTP = '';
-
-function selectChannel(ch) {
-  selectedChannel = ch;
-  document.getElementById('otpChannel').value = ch;
-  document.getElementById('channelEmail').classList.toggle('selected', ch === 'email');
-  document.getElementById('channelSms').classList.toggle('selected', ch === 'sms');
-}
-
 function togglePwd(id, btn) {
   var inp = document.getElementById(id);
-  if (inp.type === 'password') { inp.type = 'text'; btn.innerHTML = '<i class="fas fa-eye-slash"></i>'; }
-  else { inp.type = 'password'; btn.innerHTML = '<i class="fas fa-eye"></i>'; }
-}
-
-function sendOTP(e) {
-  e.preventDefault();
-  var name = document.getElementById('regName').value.trim();
-  var email = document.getElementById('regEmail').value.trim();
-  var phone = document.getElementById('regPhone').value.trim();
-  var password = document.getElementById('regPassword').value;
-
-  if (!name || !email || password.length < 6) return;
-  if (selectedChannel === 'sms' && phone.length < 10) {
-    alert('Please enter a valid 10-digit phone number to use SMS verification.');
-    return;
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    btn.innerHTML = '<i class="fas fa-eye-slash"></i>';
+  } else {
+    inp.type = 'password';
+    btn.innerHTML = '<i class="fas fa-eye"></i>';
   }
+}
 
-  var btn = document.getElementById('sendOtpBtn');
+function validateCaptcha() {
+  var ans = document.getElementById('captchaAnswer').value.trim();
+  if (!ans) {
+    document.getElementById('captchaError').style.display = 'block';
+    document.getElementById('captchaAnswer').focus();
+    return false;
+  }
+  document.getElementById('captchaError').style.display = 'none';
+
+  var btn = document.getElementById('submitBtn');
   btn.disabled = true;
-  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending OTP...';
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
+  return true;
+}
 
-  fetch('/send-otp', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({ email: email, phone: phone, channel: selectedChannel, name: name })
-  })
-  .then(r => r.json())
-  .then(data => {
-    btn.disabled = false;
-    btn.innerHTML = '<i class="fas fa-shield-alt"></i> Send OTP & Verify';
-    if (data.success) {
-      generatedOTP = data.otp_hint || '';
-      document.getElementById('stepRegister').style.display = 'none';
-      document.getElementById('stepOTP').style.display = 'block';
-      var dest = selectedChannel === 'sms' ? 'your mobile number ' + phone.slice(-4).padStart(phone.length,'*') : 'your email ' + email;
-      document.getElementById('otpSentMsg').textContent = 'Enter the 6-digit code sent to ' + dest;
-      // Focus first OTP digit
-      document.getElementById('otp0').focus();
-    } else {
-      alert(data.message || 'Failed to send OTP. Please try again.');
+// Show captcha error shake animation on wrong answer flash
+(function() {
+  var alerts = document.querySelectorAll('.alert-danger');
+  alerts.forEach(function(el) {
+    if (el.textContent.toLowerCase().includes('captcha')) {
+      var box = document.querySelector('.captcha-box');
+      if (box) {
+        box.style.borderColor = 'var(--danger)';
+        box.style.animation = 'none';
+        setTimeout(function() { box.style.animation = ''; }, 50);
+      }
+      document.getElementById('captchaAnswer') && document.getElementById('captchaAnswer').focus();
     }
-  })
-  .catch(() => {
-    btn.disabled = false;
-    btn.innerHTML = '<i class="fas fa-shield-alt"></i> Send OTP & Verify';
-    alert('Network error. Please try again.');
   });
-}
-
-// Auto-advance OTP inputs
-document.querySelectorAll('.otp-digit').forEach(function(inp, i, arr) {
-  inp.addEventListener('input', function() {
-    var v = inp.value.replace(/\D/g,'');
-    inp.value = v;
-    if (v && i < arr.length - 1) arr[i+1].focus();
-  });
-  inp.addEventListener('keydown', function(e) {
-    if (e.key === 'Backspace' && !inp.value && i > 0) arr[i-1].focus();
-  });
-  inp.addEventListener('paste', function(e) {
-    e.preventDefault();
-    var paste = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g,'');
-    arr.forEach(function(d, j) { d.value = paste[j] || ''; });
-    var next = Math.min(paste.length, arr.length - 1);
-    arr[next].focus();
-  });
-});
-
-function verifyOTP() {
-  var entered = '';
-  for (var i = 0; i < 6; i++) entered += document.getElementById('otp' + i).value;
-  if (entered.length < 6) { alert('Please enter all 6 digits.'); return; }
-
-  var btn = document.getElementById('verifyBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
-
-  fetch('/verify-otp', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({
-      email: document.getElementById('regEmail').value,
-      otp: entered
-    })
-  })
-  .then(r => r.json())
-  .then(data => {
-    btn.disabled = false;
-    btn.innerHTML = '<i class="fas fa-check-circle"></i> Verify & Create Account';
-    if (data.success) {
-      // Submit final form
-      document.getElementById('hName').value     = document.getElementById('regName').value;
-      document.getElementById('hEmail').value    = document.getElementById('regEmail').value;
-      document.getElementById('hPhone').value    = document.getElementById('regPhone').value;
-      document.getElementById('hPassword').value = document.getElementById('regPassword').value;
-      document.getElementById('finalForm').submit();
-    } else {
-      document.getElementById('otpError').style.display = 'block';
-      for (var i = 0; i < 6; i++) document.getElementById('otp' + i).value = '';
-      document.getElementById('otp0').focus();
-    }
-  })
-  .catch(() => {
-    btn.disabled = false;
-    btn.innerHTML = '<i class="fas fa-check-circle"></i> Verify & Create Account';
-    alert('Verification failed. Please try again.');
-  });
-}
-
-function resendOTP() {
-  document.getElementById('otpError').style.display = 'none';
-  document.getElementById('sendOtpBtn').click();
-  document.getElementById('stepOTP').style.display = 'none';
-  document.getElementById('stepRegister').style.display = 'block';
-  document.getElementById('registerForm').dispatchEvent(new Event('submit'));
-}
-
-function goBack() {
-  document.getElementById('stepOTP').style.display = 'none';
-  document.getElementById('stepRegister').style.display = 'block';
-}
+})();
 </script>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
