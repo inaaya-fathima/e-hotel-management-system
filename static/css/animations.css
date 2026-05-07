@@ -9,32 +9,7 @@ html {
 }
 
 /* ── Custom cursor ─────────────────────────────────── */
-*, *::before, *::after { cursor: none !important; }
-
-#cursor-dot {
-  position: fixed;
-  width: 8px; height: 8px;
-  background: var(--accent);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 99999;
-  transform: translate(-50%, -50%);
-  transition: transform 0.1s, width 0.3s, height 0.3s, background 0.3s;
-  mix-blend-mode: multiply;
-}
-#cursor-ring {
-  position: fixed;
-  width: 36px; height: 36px;
-  border: 1.5px solid rgba(201,168,76,0.6);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 99998;
-  transform: translate(-50%, -50%);
-  transition: transform 0.12s cubic-bezier(.25,.46,.45,.94),
-              width 0.3s, height 0.3s, border-color 0.3s;
-}
-body.cursor-hover #cursor-dot  { width: 14px; height: 14px; background: var(--accent2); }
-body.cursor-hover #cursor-ring { width: 54px; height: 54px; border-color: var(--accent); }
+/* Custom cursor removed */
 
 /* ── Horizontal scroll strip ───────────────────────── */
 .h-scroll-track {
@@ -397,8 +372,7 @@ body.cursor-hover #cursor-ring { width: 54px; height: 54px; border-color: var(--
 
 /* ── Responsive adjustments ─────────────────────────── */
 @media (max-width: 768px) {
-  #cursor-dot, #cursor-ring { display: none; }
-  *, *::before, *::after { cursor: auto !important; }
+  /* Custom cursor adjustments removed */
   .h-scroll-item { flex: 0 0 260px; }
   .venue-booking-card { padding: 24px 16px; }
 }
